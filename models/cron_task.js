@@ -15,8 +15,31 @@ function predictionTask() {
     console.log(`Task 'Fetch Data' process exited with code ${code}`);
   });
 
-  // Run Python task
-  
+  // Define the list of Python tasks
+  const pythonTasks = [
+    // 'task1.py'
+  ]
+
+  // Run Python task in sequence
+  let i = 0;
+  function runPythonTask() {
+    if (i < pythonTasks.length) {
+      const taskProcess = spawn('python', [pythonTasks[i]]);
+      taskProcess.stdout.on('data', (data) => {
+        console.log(data.toString());
+      });
+      taskProcess.stderr.on('data', (data) => {
+        console.log(data.toString());
+      });
+      taskProcess.on('close', (code) => {
+        console.log(`Task ${i+1} process exited with code $(code)`);
+        i++;
+        runPythonTask();
+      });
+    }
+  }
+
+  runPythonTask();
 }
 
 module.exports = { predictionTask };

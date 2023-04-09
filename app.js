@@ -27,18 +27,18 @@ app.get("/fetch", dataFetch.apiFetch);
 app.post("/getCryptoInfo", cryptoController.getCryptoInfo);
 app.post("/updateNewsInput", cryptoController.updateNewsInput);
 
-// // cron task right after server is on
+// cron task right after server is on
 // cronTask.predictionTask();
-//
-// cron.schedule("0 0 * * *", () => {
-//   // cron task at everyday 12am
-//   // https://crontab.guru/every-day
-//   try {
-//     cronTask.predictionTask();
-//   } catch (error) {
-//     console.error(error);
-//   }
-// });
+
+cron.schedule("0 0 * * *", () => {
+  // cron task at everyday 12am
+  // https://crontab.guru/every-day
+  try {
+    cronTask.predictionTask();
+  } catch (error) {
+    console.error(error);
+  }
+});
 
 app.listen(3000, () =>  {
   console.log("Server listening on port 3000!")
