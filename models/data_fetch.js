@@ -4,6 +4,7 @@ function apiFetch() {
   const axios = require('axios');
   const fs = require('fs');
   const url = require('url');
+  const path = require('path');
 
 
   function paramsToQuery(params) {
@@ -36,13 +37,14 @@ function apiFetch() {
     return diffDays;
   }
 
-  function exportToFile(data, filename) {
-    let jsonData = JSON.stringify(data);
-    fs.writeFile(filename+'.txt', jsonData, function(err) {
-     if (err) {
-        console.log(err);
-      }
-    });
+  function exportToFile(data, filepath) {
+    const directory = path.dirname(filepath);
+    if (!fs.existsSync(directory)) {
+      // Recursively create the directory if it doesn't exist
+      fs.mkdirSync(directory, { recursive: true });
+    }
+    const jsonData = JSON.stringify(data);
+    fs.writeFileSync(filepath + '.txt', jsonData);
   }
 
   const crypto_list = {
@@ -407,7 +409,7 @@ function apiFetch() {
      } catch (error) {
        console.error(error);
      };
-    exportToFile(data, 'all_data');
+    exportToFile(data, 'data/all_data');
 
     // For Crypto fetch
     for (const crypto in crypto_list) {
@@ -420,7 +422,7 @@ function apiFetch() {
         console.error(error);
       };
 
-      exportToFile(data, `${crypto_list[crypto]}_data`);
+      exportToFile(data, `data/${crypto_list[crypto]}_data`);
     }
   }
 

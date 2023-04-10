@@ -28,7 +28,7 @@ app.post("/getCryptoInfo", cryptoController.getCryptoInfo);
 app.post("/updateNewsInput", cryptoController.updateNewsInput);
 
 // cron task right after server is on
-// cronTask.predictionTask();
+cronTask.predictionTask();
 
 cron.schedule("0 0 * * *", () => {
   // cron task at everyday 12am

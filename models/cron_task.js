@@ -1,45 +1,46 @@
 const { spawn } = require('child_process');
 const { apiFetch } = require('./data_fetch.js');
 
-function predictionTask() {
-  // Run 'Fetch Data' task
-  console.log('Task "Fetch Data" process running...');
-  const fetchDataProcess = spawn('node', ['-e', `${apiFetch.toString()}; apiFetch()`]);
-  fetchDataProcess.stdout.on('data', (data) => {
-    console.log(data.toString());
-  });
-  fetchDataProcess.stderr.on('data', (data) => {
-    console.log(data.toString());
-  });
-  fetchDataProcess.on('close', (code) => {
-    console.log(`Task 'Fetch Data' process exited with code ${code}`);
-  });
+async function predictionTask() {
+  try {
+    // Run the JavaScript file
+    await runProcess('node', ['-e', `${apiFetch.toString()}; apiFetch()`]);
+    console.log('Data Fetch completed');
 
-  // Define the list of Python tasks
-  const pythonTasks = [
-    // 'task1.py'
-  ]
+    // Run the Python files in order
+    await runProcess('python', ['Data_Scrap_Prediction_1.py']);
+    console.log('Data Scrap Prediction 1 completed');
 
-  // Run Python task in sequence
-  let i = 0;
-  function runPythonTask() {
-    if (i < pythonTasks.length) {
-      const taskProcess = spawn('python', [pythonTasks[i]]);
-      taskProcess.stdout.on('data', (data) => {
-        console.log(data.toString());
-      });
-      taskProcess.stderr.on('data', (data) => {
-        console.log(data.toString());
-      });
-      taskProcess.on('close', (code) => {
-        console.log(`Task ${i+1} process exited with code $(code)`);
-        i++;
-        runPythonTask();
-      });
-    }
+    await runProcess('python', ['Data_Scrap_Prediction_2.py']);
+    console.log('Data Scrap Prediction 2 completed');
+
+    await runProcess('python', ['Data_Scrap_Prediction_3.py']);
+    console.log('Data Scrap Prediction 3 completed');
+  } catch (error) {
+    console.error(error);
   }
+}
 
-  runPythonTask();
+function runProcess(command, args) {
+  return new Promise((resolve, reject) => {
+    const process = spawn(command, args);
+
+    process.stdout.on('data', (data) => {
+      console.log(`stdout: ${data}`);
+    });
+
+    process.stderr.on('data', (data) => {
+      console.error(`stderr: ${data}`);
+    });
+
+    process.on('close', (code) => {
+      if (code !== 0) {
+        reject(`Process exited with code ${code}`);
+      } else {
+        resolve();
+      }
+    });
+  });
 }
 
 module.exports = { predictionTask };
