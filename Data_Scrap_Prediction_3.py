@@ -31,7 +31,7 @@ posts = pd.DataFrame(posts, columns = ['tiitle', 'created'])
 # In[2]:
 
 
-df_input = pd.read_csv("./data/news/input_news.csv")
+df_input = pd.read_csv("./data/news/input_news2.csv")
 df_input = df_input.rename(columns={'date': 'Date', 'input': 'News Header'})
 df_input.set_index("Date", inplace=True)
 df = pd.read_csv("./data/news/news3.csv")
@@ -232,52 +232,69 @@ def TEST_ensemble(model_1_tuple, model_2_tuple, model_3_tuple, test_loader, devi
 from torch.optim import Adam
 for i in range(len(cryptos)):
     df_pred = cryptos_df[i][["Adj Close"]]
-    df_merge = pd.merge(df, df_pred, how="inner", on=["Date"])
+    try_merge = pd.merge(df, df_pred, how="inner", on=["Date"])
+    prediction_date = df_pred.index[-1]
+    df_merge = df_pred
+    if prediction_date not in try_merge.index:
+        df_merge = pd.merge(df, df_pred, how="outer", on=["Date"])
 
+    else:
+        df_merge = pd.merge(df, df_pred, how="inner", on=["Date"])
+        
+        
     if 'Unnamed: 0' in  df_merge.columns:
         df_merge.drop(columns=["Unnamed: 0"], inplace=True)
     prediction_column = df_merge[['Adj Close', 'News Header']]
-    prediction_row = prediction_column.iloc[-1:]
-    
-    
-    
+
+    prediction_row = prediction_column.loc[[prediction_date]]
     
     test_df = prediction_row
-    test_df['Adj Close'] = test_df['Adj Close'].astype('int')
-    # The label field is redundant since it will be predicted. Just for compatitablity
-    test_df.rename(columns={"Adj Close": "label", "News Header": "news"})
+    test_df.rename(columns={"Adj Close": "label", "News Header": "news"}, inplace=True)
 
-    PATH = "./data/news/"
-    test_df.to_csv(PATH + "news_prediction.csv", index=False)
+    if prediction_date not in try_merge.index:
+        predicted = [np.nan]
+        test_df = test_df.iloc[[-1]]
+        test_df['RNN_Prediction'] = predicted
+        test_df = test_df[['RNN_Prediction']]
+        
+    else:
+        test_df['label'] = test_df['label'].astype('int')
+        PATH = "./data/news/"
+        test_df.to_csv(PATH + "news_prediction.csv", index=False)
 
-    txt_field = Field(tokenize=word_tokenize, lower=True, batch_first=True, include_lengths=True) 
-    label_field = Field(sequential=False, use_vocab=False, batch_first=True)
+        txt_field = Field(tokenize=word_tokenize, lower=True, batch_first=True, include_lengths=True) 
+        label_field = Field(sequential=False, use_vocab=False, batch_first=True)
 
-    train = TabularDataset(path=PATH + 'training.csv', format='csv', fields=[('label', label_field), ('news', txt_field)], skip_header=True)
-    test = TabularDataset(path=PATH + 'news_prediction.csv', format='csv', fields=[('label', label_field), ('news', txt_field)], skip_header=True)
-    txt_field.build_vocab(train, min_freq=2)
+        train = TabularDataset(path=PATH + 'training.csv', format='csv', fields=[('label', label_field), ('news', txt_field)], skip_header=True)
+        test = TabularDataset(path=PATH + 'news_prediction.csv', format='csv', fields=[('label', label_field), ('news', txt_field)], skip_header=True)
+        txt_field.build_vocab(train, min_freq=2)
 
-    # Build into the vocabulary from distinct words
-    vocab_distinct = set(txt_field.vocab.itos)
+        # Build into the vocabulary from distinct words
+        vocab_distinct = set(txt_field.vocab.itos)
 
-    # Make a new object instance for LSTM model
-    model_2 = Text_RNN_m2(n_vocab=len(vocab_distinct), embedding_dim=50, n_hidden=64, n_layers=1, dropout=0.1).cuda()
+        # Make a new object instance for LSTM model
+        model_2 = Text_RNN_m2(n_vocab=len(vocab_distinct), embedding_dim=50, n_hidden=64, n_layers=1, dropout=0.1).cuda()
 
-    save_name_model_2 = 'LSTM model'
-    path = "./trained_parameters/" + save_name_model_2
-    criterion = nn.BCELoss()
-    optimizer = Adam(model_2.parameters())
-    load_checkpoint(path, model_2, optimizer)
+        save_name_model_2 = 'LSTM model'
+        path = "./trained_parameters/" + save_name_model_2
+        criterion = nn.BCELoss()
+        optimizer = Adam(model_2.parameters())
+        load_checkpoint(path, model_2, optimizer)
 
-    test_iter = BucketIterator(test, batch_size=1, shuffle=False)
-    
-    device = 'cpu'
-    best_model = model_2
-    predicted = TEST_non_ensemble(best_model, test_iter, device)
-    test_df['RNN_Prediction'] = predicted
-    test_df = test_df[['RNN_Prediction']]
-    
-    
+        test_iter = BucketIterator(test, batch_size=1, shuffle=False)
+
+        device = 'cpu'
+        best_model = model_2
+        predicted = TEST_non_ensemble(best_model, test_iter, device)
+        another_array = []
+        for pred in range(len(predicted)):
+            another_array.append(predicted[pred])
+        test_df = test_df.iloc[[-1]]
+        test_df['RNN_Prediction'] = [another_array]
+        test_df = test_df[['RNN_Prediction']]
+        
+
+
     df_output = pd.merge(test_df, cryptos_df[i], how="outer", on=["Date"])
     if 'Unnamed: 0' in  df_output.columns:
         df_output.drop(columns=["Unnamed: 0"], inplace=True)
