@@ -16,4 +16,4 @@
 #### 2.6 >pip install pyyaml h5py / >pip3 install pyyaml h5py
 #### 2.7 >pip install nltk / >pip3 install nltk
 #### 2.8 >pip install praw / >pip3 install praw
-#### 2.9 Install pyTorch according to the guidelines listed here: https://github.com/pytorch/pytorch#from-source
+#### 2.9 Install pyTorch according to the guidelines listed here: https://pytorch.org/ or https://github.com/pytorch/pytorch#from-source
