@@ -91,6 +91,11 @@ table {
   width: 100%;
 }
 
+.graphics-column {
+  height: 700px;
+  padding: 10px;
+}
+
 .graphics-column > div {
   height: 100%;
 }
@@ -107,7 +112,7 @@ th {
 .dataTables_scroll
 {
     overflow:auto;
-    height: 58vh;
+    height: 530px;
 }
 
 /* * { font-family: Garamond, serif; }

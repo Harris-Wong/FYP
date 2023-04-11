@@ -15,6 +15,7 @@ const cryptoPairs = {
 
 const index = async (req, res) => {
   if (!req.session.crypto) {
+    // Default value for display: Bitcoin
     crypto = await cryptos.getCrypto("BTC-USD");
     req.session.crypto = crypto;
   }
@@ -33,10 +34,11 @@ const getCryptoInfo = async (req, res) => {
 
 // Handle the user's news input
 const updateNewsInput = async (req, res) => {
-  const news = req.body.news;
+  const newsInput = req.body.newsInput;
 
   // Handle News Input
-  console.log(news);
+  const jsonNewsInput = JSON.parse(`{"NewsInput": "${newsInput}"}`);
+  console.log(jsonNewsInput)
 
   res.redirect("/");
 };
