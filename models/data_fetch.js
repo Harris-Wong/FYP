@@ -47,6 +47,17 @@ function apiFetch() {
     fs.writeFileSync(filepath + '.txt', jsonData);
   }
 
+  function createNewsCSV() {
+    if (!fs.existsSync('data/news')) {
+      fs.mkdirSync('data/news', { recursive: true });
+    }
+
+    const csvNewsHeader = 'input,date\n';
+    fs.writeFile('data/news/input_news.csv', csvNewsHeader, (err) => {
+      if (err) throw err;
+    });
+  }
+
   const crypto_list = {
     'BTC-USD': 'BTC',
     'ADA-USD': 'ADA',
@@ -427,6 +438,7 @@ function apiFetch() {
   }
 
   apiCalls();
+  createNewsCSV();
 }
 
 module.exports = { apiFetch };

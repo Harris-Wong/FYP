@@ -1,3 +1,4 @@
+const fs = require('fs');
 const cryptos = require("../models/cryptos");
 
 const cryptoPairs = {
@@ -12,6 +13,15 @@ const cryptoPairs = {
   "OKB-USD": "OKB USD",
   "SOL-USD": "Solana USD"
 };
+
+const getToday = () => {
+  const today = new Date();
+  const day = today.getDate().toString()
+  const month = (today.getMonth() + 1).toString()
+  const year = today.getFullYear().toString();
+  const formattedDate = `${day}/${month}/${year}`;
+  return formattedDate;
+}
 
 const index = async (req, res) => {
   if (!req.session.crypto) {
@@ -35,10 +45,13 @@ const getCryptoInfo = async (req, res) => {
 // Handle the user's news input
 const updateNewsInput = async (req, res) => {
   const newsInput = req.body.newsInput;
-
+  const today = getToday();
   // Handle News Input
-  const jsonNewsInput = JSON.parse(`{"NewsInput": "${newsInput}"}`);
-  console.log(jsonNewsInput)
+  const newsObject = `${newsInput}, ${today}\n`;
+
+  fs.appendFile('./data/news/input_news.csv', newsObject, (err) => {
+    if (err) throw err;
+  });
 
   res.redirect("/");
 };
