@@ -87,7 +87,7 @@ def to_clean(df, m, n):
                     # Linear interpolation between the last and next available data
                     if (k[0] > 0 and k[1] > 0):
                         df.iloc[j, i] = ((k[1]-j)*df.iloc[k[0], i] + (j-k[0])*df.iloc[k[1], i]) / (k[1] - k[0])
-        if not (i%10):
+        if not (i%10):                
             print(str(round((m/n + float(i) / (len(df.columns)*n)) * 100, 2)) + " % done")
 
     for i in range(6, len(df.columns)):
@@ -112,19 +112,19 @@ for i in range(len(cryptos)):
     cryptos_df.append(crypto_df)
 
 
-# In[7]:
+# In[ ]:
 
 
 print("This process may take some time....")
 outdir = "./data/processed"
 if not os.path.exists(outdir):
     os.mkdir(outdir)
-
+    
 for i in range(len(cryptos)):
     df = df_features.copy()
     adj_Close = cryptos_df[i]["Adj Close"].to_list()
     df.insert(loc=1, column='Adj Close', value=adj_Close)
-
+    
     Tmr_adjClose = cryptos_df[i]["Adj Close"][1:].to_list()
     Tmr_adjClose.append(np.nan)
     df.insert(loc=2, column='Tmr_adjClose', value=Tmr_adjClose)
@@ -147,28 +147,28 @@ for i in range(len(cryptos)):
             pn.append(0)
     df.insert(loc=5, column='Positive/Negative', value=pn)
     df.set_index('Date', inplace=True)
-
+    
     df = to_clean(df, i, len(cryptos))
-
+    
     date_column = df.index.to_list()
     required_date_from = date_column[-15]
-
+    
     predict_df = df.iloc[-15:].copy()
     today = predict_df.iloc[-1]
     today_index = predict_df.index[-1]
     predict_df.dropna(axis = 1, thresh=(len(predict_df.index) - 3), inplace=True)
-
+    
     # Drop rows if any NAN exists on that date
     predict_df_for_index = predict_df.copy()
     predict_df.dropna(axis = 0, how = "any", inplace=True)
     predict_df = predict_df.append(pd.DataFrame([today],index=[today_index],columns=predict_df.columns))
     store_name = "./data/processed/" + cryptos[i] +"_prediction.csv"
     predict_df.to_csv(store_name)
-
+    
 print("All done!")
 
 
-# In[8]:
+# In[ ]:
 
 
 outdir = "./data/processed/images"
@@ -176,14 +176,14 @@ if not os.path.exists(outdir):
     os.mkdir(outdir)
 
 
-# In[9]:
+# In[ ]:
 
 
 def draw_images(crypto_name, crypto, crypto_prices, crypto_volume, crypto_close, exp1, exp2, macd, signal_line, k, m):
 
     spaths = []
     lpaths = []
-
+    
     import matplotlib.pyplot as plt
     # Turn off interactive mode to speed up
     plt.ioff()
@@ -213,18 +213,18 @@ def draw_images(crypto_name, crypto, crypto_prices, crypto_volume, crypto_close,
             dfdown = df[df.Close < df.Open]
             # plot the bullish candle stick
             #fig.tight_layout()
-            ax[0].bar(dfup.index, dfup.Close - dfup.Open, width,
+            ax[0].bar(dfup.index, dfup.Close - dfup.Open, width, 
                    bottom = dfup.Open, edgecolor='g', color='green')
-            ax[0].bar(dfup.index, dfup.High - dfup.Close, width2,
+            ax[0].bar(dfup.index, dfup.High - dfup.Close, width2, 
                    bottom = dfup.Close, edgecolor='g', color='green')
-            ax[0].bar(dfup.index, dfup.Low - dfup.Open, width2,
+            ax[0].bar(dfup.index, dfup.Low - dfup.Open, width2, 
                    bottom = dfup.Open, edgecolor='g', color='green')
             # plot the bearish candle stick
-            ax[0].bar(dfdown.index, dfdown.Close - dfdown.Open, width,
+            ax[0].bar(dfdown.index, dfdown.Close - dfdown.Open, width, 
                    bottom = dfdown.Open, edgecolor='r', color='red')
-            ax[0].bar(dfdown.index, dfdown.High - dfdown.Open, width2,
+            ax[0].bar(dfdown.index, dfdown.High - dfdown.Open, width2, 
                    bottom = dfdown.Open, edgecolor='r', color='red')
-            ax[0].bar(dfdown.index, dfdown.Low - dfdown.Close, width2,
+            ax[0].bar(dfdown.index, dfdown.Low - dfdown.Close, width2, 
                    bottom = dfdown.Close, edgecolor='r', color='red')
             ax[0].axis("off")
 
@@ -255,7 +255,7 @@ def draw_images(crypto_name, crypto, crypto_prices, crypto_volume, crypto_close,
     return spaths, lpaths
 
 
-# In[10]:
+# In[ ]:
 
 
 print("This process may take some time....")
@@ -274,8 +274,8 @@ for k in range(len(cryptos)):
     cryptos_df[k]['Close'] = cryptos_df[k]['Adj Close']
 
     p = len(cryptos_df[k])
-
-
+    
+    
     # 12 and 26 day trend most common for calculating MACD
     crypto = cryptos_df[k].set_index(pd.date_range(start_date_of_crypto, periods=p, freq="d"))
     crypto_prices = crypto[["Open","High","Low","Close"]]
@@ -286,11 +286,12 @@ for k in range(len(cryptos)):
     macd = exp1 - exp2
     # Using 9-day ema of MACD as signal line is the norm
     signal_line = macd.ewm(span=9, adjust=False).mean()
-
+    
     spaths, lpaths = draw_images(cryptos[k], crypto, crypto_prices, crypto_volume, crypto_close, exp1, exp2, macd, signal_line, k, len(cryptos))
-
+    
+    read_name = "./data/processed/" + cryptos[k] +"_prediction.csv"
     store_name = "./data/processed/" + cryptos[k] +"_imagepath.csv"
-    labels_df = pd.read_csv(store_name)
+    labels_df = pd.read_csv(read_name)
     images_labels = labels_df.iloc[-16:,:]
     images_labels.insert(1,'RT_Short_Term_Candlesticks_Pathname',np.nan)
     images_labels["RT_Short_Term_Candlesticks_Pathname"].iloc[-1] = spaths[0]
@@ -301,3 +302,7 @@ print("All done!")
 
 
 # In[ ]:
+
+
+
+

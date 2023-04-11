@@ -24,8 +24,6 @@ from tensorflow.keras.layers import Conv2D, MaxPool2D, BatchNormalization
 from tensorflow.keras.layers import Flatten, Dropout, Dense, RepeatVector
 from tensorflow.keras.layers import LSTM
 
-get_ipython().system('pip install pyyaml h5py')
-
 
 # In[2]:
 
