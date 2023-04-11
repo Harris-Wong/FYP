@@ -31,7 +31,7 @@ posts = pd.DataFrame(posts, columns = ['tiitle', 'created'])
 # In[2]:
 
 
-df_input = pd.read_csv("./data/news/input_news2.csv")
+df_input = pd.read_csv("./data/news/input_news.csv")
 df_input = df_input.rename(columns={'date': 'Date', 'input': 'News Header'})
 df_input.set_index("Date", inplace=True)
 df = pd.read_csv("./data/news/news3.csv")
