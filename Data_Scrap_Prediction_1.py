@@ -18,7 +18,6 @@ df_features = pd.read_json("./data/all_data.txt")
 
 # In[3]:
 
-
 for i in range(len(df_features.iloc[:,0])):
     df_features.iloc[i,0] = str(df_features.iloc[i,0])[:10]
     if (df_features.iloc[i,0][5] == "1"):
@@ -87,8 +86,8 @@ def to_clean(df, m, n):
                     # Linear interpolation between the last and next available data
                     if (k[0] > 0 and k[1] > 0):
                         df.iloc[j, i] = ((k[1]-j)*df.iloc[k[0], i] + (j-k[0])*df.iloc[k[1], i]) / (k[1] - k[0])
-        if not (i%10):                
-            print(str(round((m/n + float(i) / (len(df.columns)*n)) * 100, 2)) + " % done")
+        #if not (i%10):                
+            #print(str(round((m/n + float(i) / (len(df.columns)*n)) * 100, 2)) + " % done")
 
     for i in range(6, len(df.columns)):
         if not (df.iloc[:,i].isnull().values.any()):
@@ -112,10 +111,10 @@ for i in range(len(cryptos)):
     cryptos_df.append(crypto_df)
 
 
-# In[ ]:
+# In[7]:
 
 
-print("This process may take some time....")
+#print("This process may take some time....")
 outdir = "./data/processed"
 if not os.path.exists(outdir):
     os.mkdir(outdir)
@@ -151,9 +150,9 @@ for i in range(len(cryptos)):
     df = to_clean(df, i, len(cryptos))
     
     date_column = df.index.to_list()
-    required_date_from = date_column[-15]
+    required_date_from = date_column[-26]
     
-    predict_df = df.iloc[-15:].copy()
+    predict_df = df.iloc[-26:].copy()
     today = predict_df.iloc[-1]
     today_index = predict_df.index[-1]
     predict_df.dropna(axis = 1, thresh=(len(predict_df.index) - 3), inplace=True)
@@ -165,10 +164,10 @@ for i in range(len(cryptos)):
     store_name = "./data/processed/" + cryptos[i] +"_prediction.csv"
     predict_df.to_csv(store_name)
     
-print("All done!")
+#print("All done!")
 
 
-# In[ ]:
+# In[8]:
 
 
 outdir = "./data/processed/images"
@@ -176,7 +175,7 @@ if not os.path.exists(outdir):
     os.mkdir(outdir)
 
 
-# In[ ]:
+# In[9]:
 
 
 def draw_images(crypto_name, crypto, crypto_prices, crypto_volume, crypto_close, exp1, exp2, macd, signal_line, k, m):
@@ -251,14 +250,14 @@ def draw_images(crypto_name, crypto, crypto_prices, crypto_volume, crypto_close,
                 lpaths.append(path)
             plt.savefig(path)
             plt.close(fig)
-        print(str(round(k/m *100, 2)) +"% done")
+        #print(str(round(k/m *100, 2)) +"% done")
     return spaths, lpaths
 
 
-# In[ ]:
+# In[10]:
 
 
-print("This process may take some time....")
+#print("This process may take some time....")
 for k in range(len(cryptos)):
     cryptos_df[k].dropna(axis=0, how="any", inplace=True)
     start_date_of_crypto = cryptos_df[k]["Date"].iloc[0]
@@ -292,13 +291,13 @@ for k in range(len(cryptos)):
     read_name = "./data/processed/" + cryptos[k] +"_prediction.csv"
     store_name = "./data/processed/" + cryptos[k] +"_imagepath.csv"
     labels_df = pd.read_csv(read_name)
-    images_labels = labels_df.iloc[-16:,:]
+    images_labels = labels_df.iloc[-26:,:]
     images_labels.insert(1,'RT_Short_Term_Candlesticks_Pathname',np.nan)
     images_labels["RT_Short_Term_Candlesticks_Pathname"].iloc[-1] = spaths[0]
     images_labels.insert(2,'RT_Long_Term_Candlesticks_Pathname',np.nan)
     images_labels["RT_Long_Term_Candlesticks_Pathname"].iloc[-1] = lpaths[0]
     images_labels.to_csv(store_name, index=False)
-print("All done!")
+#print("All done!")
 
 
 # In[ ]:
