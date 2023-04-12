@@ -6,10 +6,10 @@
 
 ### 2. Install necessary packages:
 
-#### 2.0 Go to https://nodejs.org to install Node.js and python.org/downloads to install Python version 3.x
+#### 2.0 Go to https://nodejs.org to install Node.js and python.org/downloads to install Python version 3.8.10
 
 #### 2.1 >npm install
-#### 2.2 >pip install pandas / >pip3 install pandas
+#### 2.2 >pip install pandas==1.2.0 / >pip3 install pandas==1.2.0
 #### 2.3 >pip install numpy / >pip3 install numpy
 #### 2.4 >pip install datetime / >pip3 install datetime
 #### 2.5 >pip install matplotlib / >pip3 install matplotlib
