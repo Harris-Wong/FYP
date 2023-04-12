@@ -18,8 +18,11 @@ df_features = pd.read_json("./data/all_data.txt")
 
 # In[3]:
 
+
 for i in range(len(df_features.iloc[:,0])):
     df_features.iloc[i,0] = str(df_features.iloc[i,0])[:10]
+    if type(df_features.iloc[i,0]) != str:
+        df_features.iloc[i,0] = df_features.iloc[i,0].strftime("%d-%m-%Y")
     if (df_features.iloc[i,0][5] == "1"):
         df_features.iloc[i,0] = df_features.iloc[i,0][-2:]+"/"+df_features.iloc[i,0][5:7]+"/"+df_features.iloc[i,0][0:4]
     else :
@@ -86,7 +89,7 @@ def to_clean(df, m, n):
                     # Linear interpolation between the last and next available data
                     if (k[0] > 0 and k[1] > 0):
                         df.iloc[j, i] = ((k[1]-j)*df.iloc[k[0], i] + (j-k[0])*df.iloc[k[1], i]) / (k[1] - k[0])
-        #if not (i%10):                
+        #if not (i%20):                
             #print(str(round((m/n + float(i) / (len(df.columns)*n)) * 100, 2)) + " % done")
 
     for i in range(6, len(df.columns)):
@@ -121,11 +124,22 @@ if not os.path.exists(outdir):
     
 for i in range(len(cryptos)):
     df = df_features.copy()
+    
     adj_Close = cryptos_df[i]["Adj Close"].to_list()
     df.insert(loc=1, column='Adj Close', value=adj_Close)
     
+    for p in range(1, 2):
+        if not (df.iloc[:,p].isnull().values.any()):
+            continue
+        else:
+            for j in range(len(df.iloc[:,p])-4, len(df.iloc[:,p])):
+                if pd.isnull(df.iloc[j,p]):
+                           df.iloc[j,p] = df.iloc[j-1,p]
+    
+    cryptos_df[i]["Adj Close"] = df["Adj Close"]
     Tmr_adjClose = cryptos_df[i]["Adj Close"][1:].to_list()
     Tmr_adjClose.append(np.nan)
+                        
     df.insert(loc=2, column='Tmr_adjClose', value=Tmr_adjClose)
 
     Change = df['Tmr_adjClose'] - df["Adj Close"]
@@ -136,8 +150,15 @@ for i in range(len(cryptos)):
 
     volume = cryptos_df[i]["Volume"].to_list()
     df.insert(loc=5, column='Volume', value=volume)
-
-
+    
+    for p in range(5, 6):
+        if not (df.iloc[:,p].isnull().values.any()):
+            continue
+        else:
+            for j in range(len(df.iloc[:,p])-4, len(df.iloc[:,p])):
+                if pd.isnull(df.iloc[j,p]):
+                           df.iloc[j,p] = df.iloc[j-1,p]
+                        
     pn = []
     for k in range(len(df)):
         if (df.iloc[k,4] >0):
@@ -150,11 +171,12 @@ for i in range(len(cryptos)):
     df = to_clean(df, i, len(cryptos))
     
     date_column = df.index.to_list()
-    required_date_from = date_column[-26]
+    required_date_from = date_column[-42]
     
-    predict_df = df.iloc[-26:].copy()
+    predict_df = df.iloc[-42:].copy()
     today = predict_df.iloc[-1]
     today_index = predict_df.index[-1]
+                        
     predict_df.dropna(axis = 1, thresh=(len(predict_df.index) - 3), inplace=True)
     
     # Drop rows if any NAN exists on that date
@@ -167,7 +189,7 @@ for i in range(len(cryptos)):
 #print("All done!")
 
 
-# In[8]:
+# In[9]:
 
 
 outdir = "./data/processed/images"
@@ -175,7 +197,7 @@ if not os.path.exists(outdir):
     os.mkdir(outdir)
 
 
-# In[9]:
+# In[10]:
 
 
 def draw_images(crypto_name, crypto, crypto_prices, crypto_volume, crypto_close, exp1, exp2, macd, signal_line, k, m):
@@ -189,7 +211,7 @@ def draw_images(crypto_name, crypto, crypto_prices, crypto_volume, crypto_close,
 
     import warnings
     warnings.filterwarnings("ignore")
-    for i in range(len(crypto), len(crypto)+1):
+    for i in range(len(crypto)-41, len(crypto)+1):
         for n in [12, 26]:
             df = crypto_prices.iloc[i-n: i]
             max_volume = np.asscalar(crypto_volume[i-26:i].max(axis=0).values)
@@ -254,7 +276,7 @@ def draw_images(crypto_name, crypto, crypto_prices, crypto_volume, crypto_close,
     return spaths, lpaths
 
 
-# In[10]:
+# In[11]:
 
 
 #print("This process may take some time....")
@@ -278,7 +300,21 @@ for k in range(len(cryptos)):
     # 12 and 26 day trend most common for calculating MACD
     crypto = cryptos_df[k].set_index(pd.date_range(start_date_of_crypto, periods=p, freq="d"))
     crypto_prices = crypto[["Open","High","Low","Close"]]
+    
+    for p in range(len(crypto_prices.columns)):
+        if not (crypto_prices.iloc[:,p].isnull().values.any()):
+            continue
+        else:
+            for j in range(len(crypto_prices.iloc[:,p])-4, len(crypto_prices.iloc[:,p])):
+                if pd.isnull(crypto_prices.iloc[j,p]):
+                           crypto_prices.iloc[j,p] = crypto_prices.iloc[j-1,-1]
+    
     crypto_volume = crypto[["Volume"]]
+    if (crypto_volume.iloc[:,0].isnull().values.any()):
+        for j in range(len(crypto_volume.iloc[:,0])-4, len(crypto_volume.iloc[:,0])):
+            if pd.isnull(crypto_volume.iloc[j,0]):
+                       crypto_volume.iloc[j,0] = crypto_volume.iloc[j-1,0]
+    
     crypto_close = crypto[["Adj Close"]]
     exp1 = crypto_close.ewm(span=12, adjust=False).mean()
     exp2 = crypto_close.ewm(span=26, adjust=False).mean()
@@ -291,11 +327,11 @@ for k in range(len(cryptos)):
     read_name = "./data/processed/" + cryptos[k] +"_prediction.csv"
     store_name = "./data/processed/" + cryptos[k] +"_imagepath.csv"
     labels_df = pd.read_csv(read_name)
-    images_labels = labels_df.iloc[-26:,:]
+    images_labels = labels_df.iloc[-42:,:]
     images_labels.insert(1,'RT_Short_Term_Candlesticks_Pathname',np.nan)
-    images_labels["RT_Short_Term_Candlesticks_Pathname"].iloc[-1] = spaths[0]
+    images_labels["RT_Short_Term_Candlesticks_Pathname"] = spaths
     images_labels.insert(2,'RT_Long_Term_Candlesticks_Pathname',np.nan)
-    images_labels["RT_Long_Term_Candlesticks_Pathname"].iloc[-1] = lpaths[0]
+    images_labels["RT_Long_Term_Candlesticks_Pathname"] = lpaths
     images_labels.to_csv(store_name, index=False)
 #print("All done!")
 

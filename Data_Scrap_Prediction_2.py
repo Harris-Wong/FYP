@@ -45,13 +45,7 @@ for i in range(len(cryptos)):
     cryptos_df.append(df)
 
 
-# In[3]:
-
-
-cryptos_df[-1]
-
-
-# In[4]:
+# In[5]:
 
 
 all_test_sets = []
@@ -101,7 +95,13 @@ for i in range(len(cryptos)):
     all_test_sets.append(test_sets)
 
 
-# In[5]:
+# In[6]:
+
+
+all_test_sets
+
+
+# In[7]:
 
 
 thresholds = pd.read_csv('./trained_parameters/threshold_CNN.csv')
@@ -132,23 +132,29 @@ for i in range(len(cryptos)):
         results.append(df)
 
 
-# In[6]:
+# In[9]:
 
 
 for i in range(len(cryptos_df)):
     cryptos_df[i].insert(1,'CNN_Prediction_long',np.nan)
     cryptos_df[i].insert(2,'CNN_Prediction_short',np.nan)
     
-    cryptos_df[i]['CNN_Prediction_long'].iloc[-1] = results[i*2]['Prediction'].iloc[0]
-    cryptos_df[i]['CNN_Prediction_short'].iloc[-1] = results[i*2+1]['Prediction'].iloc[0]
+    cryptos_df[i]['CNN_Prediction_long'] = results[i*2]['Prediction']
+    cryptos_df[i]['CNN_Prediction_short'] = results[i*2+1]['Prediction']
     
     cryptos_df[i].drop(columns=['RT_Short_Term_Candlesticks_Pathname', 'RT_Long_Term_Candlesticks_Pathname', 'Date', 'Day', 'Month', 'Year', 'DateStr'], inplace=True)
 
 
-# In[7]:
+# In[10]:
 
 
 for i in range(len(cryptos_df)): 
     o_string = "./data/processed/" + cryptos[i]+"_CNN_predicted.csv"
     cryptos_df[i].to_csv(o_string)
+
+
+# In[ ]:
+
+
+
 
