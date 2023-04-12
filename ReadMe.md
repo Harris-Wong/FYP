@@ -14,7 +14,7 @@
 #### 2.3 >pip install pandas==1.2.2 / >pip3 install pandas==1.2.2
 #### 2.4 >pip install numpy==1.19.5 / >pip3 install numpy==1.19.5
 #### 2.5 >pip install datetime / >pip3 install datetime
-#### 2.6 >pip install matplotlib==3.3.4 / >pip3 install matplotlib==3.3.4
+#### 2.6 >pip install matplotlib==3.5.2 / >pip3 install matplotlib==3.5.2
 #### 2.7 >pip install tensorflow==2.4.1 / >pip3 install tensorflow==2.4.1
 #### 2.8 >pip install keras==2.4.3 / pip3 install keras==2.4.3
 #### 2.9 >pip install pyyaml h5py / >pip3 install pyyaml h5py
