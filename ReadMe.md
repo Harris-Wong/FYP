@@ -21,6 +21,11 @@
 #### 2.11 Install pyTorch according to the guidelines listed here: https://pytorch.org/ or https://github.com/pytorch/pytorch#from-source
 #### 2.12 >pip install torchtext==0.8.1 / >pip3 install torchtext==0.8.1
 
+
+## Download trained model parameters (Too big can only through Google Drive).
+
+### 3. Go to Google Drive to download CNN_trained_long and CNN_trained_short, replace those current folders under "trained parameters" directory
+
 ## Begin the server
 
-### 3. >node app.js
+### 4. >node app.js
