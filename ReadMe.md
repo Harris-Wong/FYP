@@ -8,6 +8,8 @@
 
 #### 2.0 Go to https://nodejs.org to install Node.js 
 #### 2.1 Go to python.org/downloads to install Python version 3.8.10
+
+### In the terminal / command prompt, type the following one by one.
 #### 2.2 >npm install
 #### 2.3 >pip install pandas==1.2.2 / >pip3 install pandas==1.2.2
 #### 2.4 >pip install numpy==1.19.5 / >pip3 install numpy==1.19.5
