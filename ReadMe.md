@@ -18,4 +18,4 @@
 #### 2.8 >pip install nltk / >pip3 install nltk
 #### 2.9 >pip install praw / >pip3 install praw
 #### 2.10 Install pyTorch according to the guidelines listed here: https://pytorch.org/ or https://github.com/pytorch/pytorch#from-source
-#### 2.11 >pip install torchtext / >pip3 install praw
+#### 2.11 >pip install torchtext / >pip3 install torchtext
