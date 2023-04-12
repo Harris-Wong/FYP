@@ -7,7 +7,7 @@
 ### 2. Install necessary packages:
 
 #### 2.0 Go to https://nodejs.org to install Node.js 
-#### 2.1 Go to python.org/downloads to install Python version 3.8.10. If your machine has already installed Python with other version, such as Python 3.11, you must uninstall it. This can be done by going to the "Applications" of your local computer, find Python and uninstall it. Verify the correct version (Python 3.8.10) by typing in terminal / command prompt python --version OR python3 --version
+#### 2.1 Go to python.org/downloads to install Python version 3.8.10. If your environment has already installed Python with other version, such as Python 3.11, you must uninstall it. This can be done by going to the "Applications" of your local computer, find Python and uninstall it. Verify the correct version (Python 3.8.10) by typing in terminal / command prompt python --version OR python3 --version
 
 ### In the terminal / command prompt, type the following one by one.
 #### 2.2 >npm install
