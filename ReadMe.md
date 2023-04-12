@@ -21,7 +21,7 @@
 #### 2.10 >pip install nltk / >pip3 install nltk
 #### 2.11 >pip install praw / >pip3 install praw
 #### 2.12 Install pyTorch according to the guidelines listed here: https://pytorch.org/ or https://github.com/pytorch/pytorch#from-source
-#### 2.13 >pip install torchtext==0.8.1 / >pip3 install torchtext==0.8.1
+#### 2.13 >pip install torchtext==0.8.1 / >pip3 install torchtext==0.8.1 / >pip install torchtext==0.6.0 / >pip3 install torchtext==0.6.0
 
 
 ## Download trained model parameters (Too big can only through Google Drive).
