@@ -86,7 +86,7 @@ if __name__ == "__main__":
         json_file[coin] = signal
         # Save CSV
         df.to_csv(f"data/processed/{coin}_final_predicted.csv")
-        print(f"{coin}: Done")
+        #print(f"{coin}: Done")
     # Save JSON
     json_object = json.dumps(json_file)
     # Writing to sample.json
