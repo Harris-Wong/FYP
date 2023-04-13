@@ -74,6 +74,33 @@ const updateNewsInput = async (req, res) => {
   res.redirect("/");
 };
 
+const clearNewsInput = async (req, res) => {
+  const csvNewsHeader = 'input,date\n';
+    fs.writeFile('data/news/input_news.csv', csvNewsHeader, (err) => {
+      if (err) throw err;
+    });
+
+    try {
+      await runProcess('python', ['Data_Scrap_Prediction_3.py']);
+      console.log('News Prediction 1/2 completed');
+      
+      //await runProcess('python3', ['Data_Scrap_Prediction_3.py']);
+      //console.log('News Prediction 1/2 completed');
+  
+      await runProcess('python', ['Data_Scrap_Prediction_4.py']);
+      console.log('News Prediction 2/2 completed');
+      
+      //await runProcess('python3', ['Data_Scrap_Prediction_4.py']);
+      //console.log('News Prediction 2/2 completed');
+  
+    } catch (error) {
+      console.error(error);
+    }
+    
+  res.redirect("/");
+};
+
+
 function runProcess(command, args) {
   return new Promise((resolve, reject) => {
     const process = spawn(command, args);
@@ -96,4 +123,4 @@ function runProcess(command, args) {
   });
 }
 
-module.exports = { index, getCryptoInfo, updateNewsInput};
+module.exports = { index, getCryptoInfo, updateNewsInput, clearNewsInput};
