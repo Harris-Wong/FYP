@@ -206,6 +206,7 @@ def draw_images(crypto_name, crypto, crypto_prices, crypto_volume, crypto_close,
     lpaths = []
     
     import matplotlib.pyplot as plt
+    import matplotlib
     # Turn off interactive mode to speed up
     plt.ioff()
 
@@ -270,8 +271,10 @@ def draw_images(crypto_name, crypto, crypto_prices, crypto_volume, crypto_close,
             elif n == 26:
                 path = "./data/processed/images/" + crypto_name + d + "long.png"
                 lpaths.append(path)
-            plt.savefig(path)
+            matplotlib.use('agg')
+            plt.savefig(path, format='png')
             plt.close(fig)
+            plt.clf()
         #print(str(round(k/m *100, 2)) +"% done")
     return spaths, lpaths
 
