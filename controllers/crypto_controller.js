@@ -55,11 +55,17 @@ const updateNewsInput = async (req, res) => {
   });
 
   try {
-    await runProcess('python3', ['Data_Scrap_Prediction_3.py']);
+    await runProcess('python', ['Data_Scrap_Prediction_3.py']);
     console.log('News Prediction 1/2 completed');
+    
+    //await runProcess('python3', ['Data_Scrap_Prediction_3.py']);
+    //console.log('News Prediction 1/2 completed');
 
-    await runProcess('python3', ['Data_Scrap_Prediction_4.py']);
+    await runProcess('python', ['Data_Scrap_Prediction_4.py']);
     console.log('News Prediction 2/2 completed');
+    
+    //await runProcess('python3', ['Data_Scrap_Prediction_4.py']);
+    //console.log('News Prediction 2/2 completed');
 
   } catch (error) {
     console.error(error);
