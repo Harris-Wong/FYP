@@ -1,4 +1,5 @@
 const fs = require('fs');
+const { spawn } = require('child_process');
 const cryptos = require("../models/cryptos");
 
 const cryptoPairs = {
@@ -53,7 +54,40 @@ const updateNewsInput = async (req, res) => {
     if (err) throw err;
   });
 
+  try {
+    await runProcess('python3', ['Data_Scrap_Prediction_3.py']);
+    console.log('News Prediction 1/2 completed');
+
+    await runProcess('python3', ['Data_Scrap_Prediction_4.py']);
+    console.log('News Prediction 2/2 completed');
+
+  } catch (error) {
+    console.error(error);
+  }
+  
   res.redirect("/");
 };
+
+function runProcess(command, args) {
+  return new Promise((resolve, reject) => {
+    const process = spawn(command, args);
+
+    process.stdout.on('data', (data) => {
+      console.log(`stdout: ${data}`);
+    });
+
+    process.stderr.on('data', (data) => {
+      console.error(`stderr: ${data}`);
+    });
+
+    process.on('close', (code) => {
+      if (code !== 0) {
+        reject(`Process exited with code ${code}`);
+      } else {
+        resolve();
+      }
+    });
+  });
+}
 
 module.exports = { index, getCryptoInfo, updateNewsInput};
