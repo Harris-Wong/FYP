@@ -51,12 +51,18 @@ def Decision(mlr, cnnlong, cnnshort, adjclose, rnn):
     return False
 
 def calculate_conf_level(mlr,adjclose,news):
-    rnn = max(news)
+    if news:
+        rnn = max(news)
+    else:
+        rnn = None
     dif_true_up = joblib.load("./trained_parameters/dif_true_up.save")
     dif_true_down = joblib.load("./trained_parameters/dif_true_down.save")
     mlr_dif = (mlr/adjclose)-1.0244
     mlr_dif = mlr_dif/1.0244
-    rnn_dif = (rnn-0.602)/0.602
+    if rnn:
+        rnn_dif = (rnn-0.602)/0.602
+    else:
+        rnn_dif = 0
     target = 0
     if (mlr_dif > 0) or (rnn_dif > 0): # Buy signal
         target = max(mlr_dif,rnn_dif)
@@ -102,10 +108,10 @@ if __name__ == "__main__":
         y = df[['Adj Close']][-26:-1]
         mlr = LinearRegression().fit(x,y)
         mlr_prediction = mlr.predict(df[['LSTM_2014','LSTM_2017','CNN_Prediction_long','CNN_Prediction_short']].iloc[-1:,:])[0][0]
-        # Confidence Level
-        cdf = calculate_conf_level(mlr_prediction,df.iloc[-1,3],news_array)
         # Strategy
         news_array = str(df.iloc[-1,0]).strip(',')
+        # Confidence Level
+        cdf = calculate_conf_level(mlr_prediction,df.iloc[-1,3],news_array)
         signal = Decision(mlr_prediction,df.iloc[-1,1],df.iloc[-1,2],df.iloc[-1,3],news_array)
         json_file[coin] = {"signal":signal,"conf":cdf}
         # Save CSV
