@@ -67,8 +67,9 @@ const updateNewsInput = async (req, res) => {
     const newsInput = req.body.newsInput;
 
     if (newsInput && newsInput.trim() !== '') {
-      // check for empty or space input
+      // Check for empty or space input
       const today = getToday();
+      
       // Handle News Input
       const newsObject = `${newsInput}, ${today}\n`;
      
@@ -78,14 +79,13 @@ const updateNewsInput = async (req, res) => {
         const newsFile = fs.readFileSync('./data/news/input_news.csv', 'utf-8');
         const rows = newsFile.split('\n');
         
-        // update frontend news
+        // Update Frontend News
         newsArray = [];
         for (let i = 1; i < rows.length-1; i++) {
           const news = rows[i].split(',')[0];
           newsArray.push(news);
         }
       })
-    }
       try {
         await runProcess('python', ['Data_Scrap_Prediction_3.py']);
         console.log('News Prediction 1/2 completed');
@@ -95,6 +95,7 @@ const updateNewsInput = async (req, res) => {
       } catch (error) {
         console.error(error);
       }
+    }
   } else if (req.body.clear_button) {
     // Perform operation for Clean button
     const csvNewsHeader = 'input,date\n';
