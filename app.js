@@ -26,7 +26,6 @@ app.get("/", cryptoController.index);
 app.get("/fetch", dataFetch.apiFetch);
 app.post("/getCryptoInfo", cryptoController.getCryptoInfo);
 app.post("/updateNewsInput", cryptoController.updateNewsInput);
-app.post("/clearNewsInput", cryptoController.clearNewsInput);
 
 // cron task right after server is on
 //cronTask.predictionTask();
