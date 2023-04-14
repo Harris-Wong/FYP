@@ -32,16 +32,16 @@
     }
     setInterval(display_current_time, 1000);
   </script>
-    <script type="text/javascript">
-      function display_next_predict_time() {
-        var now = new Date();
-        var endOfDay = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()+1, 0, 0, 0));
-        var timeLeft = endOfDay.getTime() - now.getTime();
-        var countdown = new Date(timeLeft).toISOString().substr(11, 8);
-        document.getElementById('next_predict_time').innerHTML = countdown;
-      }
-      setInterval(display_next_predict_time, 1000);
-    </script>
+  <script type="text/javascript">
+    function display_next_predict_time() {
+      var now = new Date();
+      var endOfDay = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()+1, 0, 0, 0));
+      var timeLeft = endOfDay.getTime() - now.getTime();
+      var countdown = new Date(timeLeft).toISOString().substr(11, 8);
+      document.getElementById('next_predict_time').innerHTML = countdown;
+    }
+    setInterval(display_next_predict_time, 1000);
+  </script>
 </head>
 
 <body>
@@ -82,8 +82,8 @@
                 placeholder="(Optional) News Input"
               ></textarea>
             </div>
-            <button name="predict_button" value="predict" class="btn btn-dark mx-2" type="submit">Predict</button>
-            <button name="clear_button" value="Clear" class="btn btn-danger" type="submit" style="white-space: nowrap;">Clear News</button>
+            <button name="predict_button" value="predict" class="btn btn-dark mx-2" type="submit">Predict with News</button>
+            <button name="clear_button" value="Clear" class="btn btn-danger" type="submit" style="white-space: nowrap;">Clear All News</button>
           </form>
         </div>
 
@@ -112,9 +112,9 @@
             <div class="card-body d-flex flex-column align-items-center">
               <p>Forecast for Tomorrow 
                 <% if (newsArray && newsArray.length > 0) { %>
-                  <span class="user-input">(based on User Input)</span>
+                  <span class="user-input">(based on Your News)</span>
                 <% } %>
-                 :
+                :
               </p>
               <p>
                 <% if (signalValue == true) { %>
@@ -134,7 +134,7 @@
                 </div>
               <% } %>
 
-              <p style="color: #C0C0C0;">Next Forecast countdown: <span id="next_predict_time"></span></p>
+              <p style="color: #C0C0C0;">Next Forecast Countdown: <span id="next_predict_time"></span></p>
             </div>
           </div>
         </div>
@@ -145,10 +145,10 @@
               <h4>Today Price</h4>
             </div>
             <div class="card-body text-start">
-              <p><b>Open:</b> <%= parseFloat((crypto.summary.summaryDetail.regularMarketOpen).toPrecision(6)) %></p>
-              <p><b>High:</b> <%= parseFloat((crypto.summary.summaryDetail.regularMarketDayHigh).toPrecision(6)) %></p>
-              <p><b>Low:</b> <%= parseFloat((crypto.summary.summaryDetail.regularMarketDayLow).toPrecision(6)) %></p>
-              <p><b>Volume:</b> <%= (crypto.summary.summaryDetail.volume).toLocaleString("en-US") %></p>
+              <p><b>Open:</b> $<%= parseFloat((crypto.summary.summaryDetail.regularMarketOpen).toPrecision(6)) %></p>
+              <p><b>High:</b> $<%= parseFloat((crypto.summary.summaryDetail.regularMarketDayHigh).toPrecision(6)) %></p>
+              <p><b>Low:</b> $<%= parseFloat((crypto.summary.summaryDetail.regularMarketDayLow).toPrecision(6)) %></p>
+              <p><b>Volume:</b> $<%= (crypto.summary.summaryDetail.volume).toLocaleString("en-US") %></p>
               <p><b>Market Cap:</b> <%= (crypto.summary.summaryDetail.marketCap).toLocaleString("en-US") %></p>
               <p><b>Circulating Supply:</b> <%= (crypto.summary.summaryDetail.circulatingSupply).toLocaleString("en-US") %></p>
             </div>
@@ -161,10 +161,10 @@
               <h4>Past Details</h4>
             </div>
             <div class="card-body text-start">
-              <p><b>52 Week Low:</b> <%= parseFloat((crypto.summary.summaryDetail.fiftyTwoWeekLow).toPrecision(6)) %></p>
-              <p><b>52 Week High:</b> <%= parseFloat((crypto.summary.summaryDetail.fiftyTwoWeekHigh).toPrecision(6)) %></p>
-              <p><b>50 Day Average Price:</b> <%= parseFloat((crypto.summary.summaryDetail.fiftyDayAverage).toPrecision(6)) %></p>
-              <p><b>200 Day Average Price:</b> <%= parseFloat((crypto.summary.summaryDetail.twoHundredDayAverage).toPrecision(6)) %></p>
+              <p><b>52 Week Low:</b> $<%= parseFloat((crypto.summary.summaryDetail.fiftyTwoWeekLow).toPrecision(6)) %></p>
+              <p><b>52 Week High:</b> $<%= parseFloat((crypto.summary.summaryDetail.fiftyTwoWeekHigh).toPrecision(6)) %></p>
+              <p><b>50 Day Average Price:</b> $<%= parseFloat((crypto.summary.summaryDetail.fiftyDayAverage).toPrecision(6)) %></p>
+              <p><b>200 Day Average Price:</b> $<%= parseFloat((crypto.summary.summaryDetail.twoHundredDayAverage).toPrecision(6)) %></p>
               <p><b>10 Day Average Volume:</b> <%= (crypto.summary.summaryDetail.averageVolume10days).toLocaleString("en-US") %></p>
             </div>
           </div>
@@ -197,6 +197,7 @@
               <thead>
                 <tr class="table-dark">
                   <th scope="col">Date</th>
+                  <th scope="col">Actual</th>
                   <th scope="col">Forecast</th>
                   <th scope="col">Open</th>
                   <th scope="col">High</th>
@@ -209,6 +210,7 @@
                 <% for (const price of crypto.prices) { %>
                   <tr>
                     <th scope="row"><%= price.date %></th>
+                    <td>-</td>
                     <td>-</td>
                     <td><%= price.open %></td>
                     <td><%= price.high %></td>
@@ -240,11 +242,12 @@
       // news prediction form
       $('[data-toggle="tooltip"]').tooltip({
         delay: {
-          "show": 400,
+          "show": 300,
           "hide": 100
-        }
+        },
+        placement: "bottom",
       })
-    })
+    });
   </script>
 
   <script src="js/chart.js"></script>
@@ -278,6 +281,7 @@
             }
           },
           {},
+          {},
           { render: formatter1 },
           { render: formatter1 },
           { render: formatter1 },
@@ -291,7 +295,7 @@
         initComplete: () => $(".table-responsive").show()
       });
       jQuery('#crypto-table').wrap('<div class="dataTables_scroll" />');
-    })
+    });
   </script>
 
 </body>

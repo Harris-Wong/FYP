@@ -86,15 +86,15 @@ const updateNewsInput = async (req, res) => {
           newsArray.push(news);
         }
       })
-      try {
-        await runProcess('python', ['Data_Scrap_Prediction_3.py']);
-        console.log('News Prediction 1/2 completed');
+      // try {
+      //   await runProcess('python', ['Data_Scrap_Prediction_3.py']);
+      //   console.log('News Prediction 1/2 completed');
     
-        await runProcess('python', ['Data_Scrap_Prediction_4.py']);
-        console.log('News Prediction 2/2 completed');
-      } catch (error) {
-        console.error(error);
-      }
+      //   await runProcess('python', ['Data_Scrap_Prediction_4.py']);
+      //   console.log('News Prediction 2/2 completed');
+      // } catch (error) {
+      //   console.error(error);
+      // }
     }
   } else if (req.body.clear_button) {
     // Perform operation for Clean button
@@ -102,16 +102,16 @@ const updateNewsInput = async (req, res) => {
     fs.writeFile('data/news/input_news.csv', csvNewsHeader, (err) => {
       if (err) throw err;
     });
-
-    try {
-      await runProcess('python', ['Data_Scrap_Prediction_3.py']);
-      console.log('News Prediction 1/2 completed');
+    newsArray = [];
+    // try {
+    //   await runProcess('python', ['Data_Scrap_Prediction_3.py']);
+    //   console.log('News Prediction 1/2 completed');
       
-      await runProcess('python', ['Data_Scrap_Prediction_4.py']);
-      console.log('News Prediction 2/2 completed');
-    } catch (error) {
-      console.error(error);
-    }
+    //   await runProcess('python', ['Data_Scrap_Prediction_4.py']);
+    //   console.log('News Prediction 2/2 completed');
+    // } catch (error) {
+    //   console.error(error);
+    // }
   }
 
   res.redirect("/");
