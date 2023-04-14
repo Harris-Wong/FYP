@@ -64,7 +64,8 @@ const getCryptoInfo = async (req, res) => {
 const updateNewsInput = async (req, res) => {
   if (req.body.predict_button) {
     // Perform operation for Predict button
-    const newsInput = req.body.newsInput;
+    let newsInput = req.body.newsInput;
+    newsInput = JSON.stringify(newsInput).split('\\r\\n').join(" ");
 
     if (newsInput && newsInput.trim() !== '') {
       // Check for empty or space input
