@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[2]:
-
-
 import pandas as pd
 import numpy as np
 import joblib
@@ -11,22 +5,25 @@ from tensorflow import keras
 from sklearn.linear_model import LinearRegression
 import json
 import warnings
+import os
+
 warnings.filterwarnings("ignore")
 pd.options.mode.chained_assignment = None
 # load trained models and scalers
 sc2014 = joblib.load("./trained_parameters/Scaler/sc2014_updated.save")
 sc2017 = joblib.load("./trained_parameters/Scaler/sc2017_updated.save")
-model2014 = keras.models.load_model("./trained_parameters/models/lstm_model2014_updated/")
-model2017 = keras.models.load_model("./trained_parameters/models/lstm_model2017_updated/")
+# model2014 = keras.models.load_model("models/lstm_model2014_updated/")
+# model2017 = keras.models.load_model("models/lstm_model2017_updated/")
+loaded_2014 = open('./trained_parameters/models/model_2014.json', 'r')
+model2014 = keras.models.model_from_json(loaded_2014.read())
+model2014.load_weights("./trained_parameters/models/model2014.h5")
+loaded_2017 = open('./trained_parameters/models/model_2017.json', 'r')
+model2017 = keras.models.model_from_json(loaded_2017.read())
+model2017.load_weights("./trained_parameters/models/model2017.h5")
 features2014 = ["Adj Close"] + list(sc2014.feature_names_in_)
 features2017 = ["Adj Close"] + list(sc2017.feature_names_in_)
 assets = ['ADA','BCH','BNB','BTC','DOGE','ETH','FTT','LINK','OKB','SOL']
-
-
-# In[ ]:
-
-
-# create batches for LSTM   
+# create batches for LSTM
 def create_lstm_dataset(dataset,y_index,timestep=1):
     dataX,dataY = [],[]
     for i in range(len(dataset)-timestep):
@@ -53,13 +50,6 @@ def Decision(mlr, cnnlong, cnnshort, adjclose, rnn):
   else:
     return False
 
-
-# In[ ]:
-
-
-outdir = "./data/output"
-if not os.path.exists(outdir):
-    os.mkdir(outdir)
     
 if __name__ == "__main__":
     json_file = {}
@@ -91,11 +81,12 @@ if __name__ == "__main__":
         mlr = LinearRegression().fit(x,y)
         mlr_prediction = mlr.predict(df[['LSTM_2014','LSTM_2017','CNN_Prediction_long','CNN_Prediction_short']].iloc[-1:,:])[0][0]
         # Strategy
-        signal = Decision(mlr_prediction,df.iloc[-1,1],df.iloc[-1,2],df.iloc[-1,3],json.loads(df.iloc[-1,0]))
+        news_array = str(df.iloc[-1,0]).strip(',')
+        signal = Decision(mlr_prediction,df.iloc[-1,1],df.iloc[-1,2],df.iloc[-1,3],news_array)
         json_file[coin] = signal
         # Save CSV
-        df.to_csv(f"data/output/{coin}_final_predicted.csv")
-        print(f"{coin}: Done")
+        df.to_csv(f"data/processed/{coin}_final_predicted.csv")
+        #print(f"{coin}: Done")
     # Save JSON
     json_object = json.dumps(json_file)
     # Writing to sample.json
@@ -103,4 +94,5 @@ if __name__ == "__main__":
         outfile.write(json_object)
     # Done, exit()
     exit()
-
+    
+    
