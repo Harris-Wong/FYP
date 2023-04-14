@@ -52,6 +52,7 @@ def Decision(mlr, cnnlong, cnnshort, adjclose, rnn):
 
 def calculate_conf_level(mlr,adjclose,news):
     if news:
+        news = np.array(news).astype(np.float)
         rnn = max(news)
     else:
         rnn = None
@@ -108,10 +109,10 @@ if __name__ == "__main__":
         y = df[['Adj Close']][-26:-1]
         mlr = LinearRegression().fit(x,y)
         mlr_prediction = mlr.predict(df[['LSTM_2014','LSTM_2017','CNN_Prediction_long','CNN_Prediction_short']].iloc[-1:,:])[0][0]
-        # Strategy
         news_array = str(df.iloc[-1,0]).strip(',')
         # Confidence Level
         cdf = calculate_conf_level(mlr_prediction,df.iloc[-1,3],news_array)
+        # Strategy
         signal = Decision(mlr_prediction,df.iloc[-1,1],df.iloc[-1,2],df.iloc[-1,3],news_array)
         json_file[coin] = {"signal":signal,"conf":cdf}
         # Save CSV
