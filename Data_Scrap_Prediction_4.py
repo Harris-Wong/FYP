@@ -50,6 +50,34 @@ def Decision(mlr, cnnlong, cnnshort, adjclose, rnn):
   else:
     return False
 
+def calculate_conf_level(mlr,adjclose,news):
+    if news:
+        rnn = max(news)
+    else:
+        rnn = None
+    dif_true_up = joblib.load("./trained_parameters/dif_true_up.save")
+    dif_true_down = joblib.load("./trained_parameters/dif_true_down.save")
+    mlr_dif = (mlr/adjclose)-1.0244
+    mlr_dif = mlr_dif/1.0244
+    if rnn:
+        rnn_dif = (rnn-0.602)/0.602
+    else:
+        rnn_dif = 0
+    target = 0
+    if (mlr_dif > 0) or (rnn_dif > 0): # Buy signal
+        target = max(mlr_dif,rnn_dif)
+        p = sum(i < target for i in dif_true_up)
+        cdf = p/len(dif_true_up)
+        # print(f"Confidence level of this Buy signal is: {round(cdf*100,3)}%")
+        return round(cdf,5)
+        
+    else:
+        target = min(mlr_dif,rnn_dif)
+        p = sum(i > target for i in dif_true_down)
+        cdf = p/len(dif_true_down)
+        # print(f"Confidence level of this Sell signal is: {round(cdf*100,3)}%")
+        return round(cdf,5)
+    
     
 if __name__ == "__main__":
     json_file = {}
@@ -81,9 +109,16 @@ if __name__ == "__main__":
         mlr = LinearRegression().fit(x,y)
         mlr_prediction = mlr.predict(df[['LSTM_2014','LSTM_2017','CNN_Prediction_long','CNN_Prediction_short']].iloc[-1:,:])[0][0]
         # Strategy
-        news_array = str(df.iloc[-1,0]).strip(',')
+        news_array = str(df.iloc[-1,0])[1:-1].split(',')
+        # Confidence Level
+        for i in range(len(news_array)):
+            number = news_array[i].split('.')
+            number = float(number[1])/10.0
+            news_array[i] = number
+        cdf = calculate_conf_level(mlr_prediction,df.iloc[-1,3],news_array)
+        # Strategy
         signal = Decision(mlr_prediction,df.iloc[-1,1],df.iloc[-1,2],df.iloc[-1,3],news_array)
-        json_file[coin] = signal
+        json_file[coin] = {"signal":signal,"conf":cdf}
         # Save CSV
         df.to_csv(f"data/processed/{coin}_final_predicted.csv")
         #print(f"{coin}: Done")
@@ -94,5 +129,3 @@ if __name__ == "__main__":
         outfile.write(json_object)
     # Done, exit()
     exit()
-    
-    
