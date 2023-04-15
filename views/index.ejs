@@ -42,6 +42,39 @@
     }
     setInterval(display_next_predict_time, 1000);
   </script>
+  <style>
+
+    .gradient-bar {
+      width: 200px;
+      height: 20px;
+      position: relative;
+      background-repeat: no-repeat;
+      background-position: left center;
+      background-clip: content-box;
+    }
+
+    .red-gradient {
+      background: linear-gradient(to right, #8b0000 0%, #ff0000 100%);
+      background-size: 200px 100%;
+    }
+
+    .green-gradient {
+      background: linear-gradient(to right, #006400 0%, #00ff00 100%);
+      background-size: 200px 100%;
+    }
+
+    .confidence-line {
+      position: absolute;
+      top: -2px;
+      left: calc(50% - 1.5px);
+      width: 3px;
+      height: calc(100% + 4px);
+      background-color: #000;
+      z-index: 1;
+    }
+
+  </style>
+
 </head>
 
 <body>
@@ -116,13 +149,24 @@
                 <% } %>
                 :
               </p>
-              <p>
-                <% if (signalValue == true) { %>
-                  <i class="fa-solid fa-arrow-up fa-2xl" style="color: #00ff00;"></i>
+              <div>
+                <% if (signalValue && signalValue.signal == true) { %>
+                  <i class="fa-solid fa-arrow-up fa-5x" style="color: #00ff00;"></i>
+                  <div style="margin: 5px 0;">
+                    <div class="gradient-bar green-gradient">
+                      <span class="confidence-line" style="<%= 'left: calc(' + signalValue.conf * 100 + '% - 1.5px);' %>" ></span>
+                    </div>
+                  </div>
                 <% } else { %>
                   <i class="fa-solid fa-arrow-down fa-5x" style="color: #ff0000;"></i>
+                  <div style="margin: 5px 0;">
+                    <div class="gradient-bar red-gradient">
+                      <span class="confidence-line" style="<%= 'left: calc(' + signalValue.conf * 100 + '% - 1.5px);' %>" ></span>
+                    </div>
+                  </div>
                 <% } %>
-              </p>
+              </div>
+
               <% if (newsArray && newsArray.length > 0) { %>
                 <div style="text-align: left; font-size: 12px;">
                   <p>Your News:</p>
@@ -133,7 +177,6 @@
                   </ul>  
                 </div>
               <% } %>
-
               <p style="color: #C0C0C0;">Next Forecast Countdown: <span id="next_predict_time"></span></p>
             </div>
           </div>
@@ -199,6 +242,7 @@
                   <th scope="col">Date</th>
                   <th scope="col">Actual</th>
                   <th scope="col">Forecast</th>
+                  <th scope="col">Confidence</th>
                   <th scope="col">Open</th>
                   <th scope="col">High</th>
                   <th scope="col">Low</th>
@@ -210,6 +254,7 @@
                 <% for (const price of crypto.prices) { %>
                   <tr>
                     <th scope="row"><%= price.date %></th>
+                    <td>-</td>
                     <td>-</td>
                     <td>-</td>
                     <td><%= price.open %></td>
@@ -280,6 +325,7 @@
               return data;
             }
           },
+          {},
           {},
           {},
           { render: formatter1 },

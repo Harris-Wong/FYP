@@ -6,6 +6,7 @@ body {
 p {
   line-height: normal;
   color: #565656;
+  margin: 10px auto;
 }
 
 /* Container */
@@ -112,4 +113,8 @@ th {
 {
     overflow:auto;
     height: 530px;
+}
+
+.card-body {
+  padding: 5px 10px;
 }

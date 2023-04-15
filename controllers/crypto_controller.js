@@ -6,11 +6,11 @@ const cryptoPairs = {
   "BTC-USD": "Bitcoin USD",
   "ADA-USD": "Cardano USD",
   "BCH-USD": "Bitcoin Cash USD",
+  'BNB-USD': 'Binance Coin USD',
   "DOGE-USD": "Dogecoin USD",
   "ETH-USD": "Ethereum USD",
   "FTT-USD": "FTX Token USD",
   "LINK-USD": "Chainlink USD",
-  "LTC-USD": "Litecoin USD",
   "OKB-USD": "OKB USD",
   "SOL-USD": "Solana USD"
 };
@@ -35,20 +35,21 @@ const index = async (req, res) => {
 
   // Get Signal Data
   let signalValue;
-  fs.readFile('./data/signals.json', 'utf8', (err, data) => {
+  fs.readFile('./signals.json', 'utf8', (err, data) => {
     if (err) {
       console.log(err);
       return;
     }
     const signalData = JSON.parse(data);
     for (const key in signalData) {
-      if (key == (req.session.crypto.summary.price.symbol).substring(0, 3)) {
+      if (key == (req.session.crypto.summary.price.symbol).split("-")[0]) {
         signalValue = signalData[key];
       }
     }
+    signalValue.signal = true;
+    signalValue.conf = 0.7;
+    res.render("index", { crypto: req.session.crypto, cryptoPairs, signalValue, newsArray });
   });
-
-  res.render("index", { crypto: req.session.crypto, cryptoPairs, signalValue, newsArray });
 };
 
 // Handle the get stock request
