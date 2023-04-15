@@ -153,6 +153,10 @@
                 <% if (signalValue && signalValue.signal == true) { %>
                   <i class="fa-solid fa-arrow-up fa-5x" style="color: #00ff00;"></i>
                   <div style="margin: 5px 0;">
+                    <div style="display: flex; justify-content: space-between; margin-top: 5px; font-size: 10px;">
+                      <div style="text-align: left;">Least Confident</div>
+                      <div style="text-align: right;">Most Confident</div>                        
+                    </div>
                     <div class="gradient-bar green-gradient">
                       <span class="confidence-line" style="<%= 'left: calc(' + signalValue.conf * 100 + '% - 1.5px);' %>" ></span>
                     </div>
@@ -160,6 +164,10 @@
                 <% } else { %>
                   <i class="fa-solid fa-arrow-down fa-5x" style="color: #ff0000;"></i>
                   <div style="margin: 5px 0;">
+                    <div style="display: flex; justify-content: space-between; margin-top: 5px; font-size: 10px;">
+                      <div style="text-align: left;">Least Confident</div>
+                      <div style="text-align: right;">Most Confident</div>                        
+                    </div>
                     <div class="gradient-bar red-gradient">
                       <span class="confidence-line" style="<%= 'left: calc(' + signalValue.conf * 100 + '% - 1.5px);' %>" ></span>
                     </div>
@@ -256,7 +264,29 @@
                     <th scope="row"><%= price.date %></th>
                     <td>-</td>
                     <td>-</td>
-                    <td>-</td>
+                    <td style="padding: 0; margin: 0;">
+                      <% if (signalValue && signalValue.signal == true) { %>
+                        <div style="margin: 5px 0;">
+                          <div style="display: flex; justify-content: space-between; margin-top: 5px; font-size: 8px;">
+                            <div style="text-align: left;">Least Confident</div>
+                            <div style="text-align: right;">Most Confident</div>                        
+                          </div>
+                          <div class="gradient-bar green-gradient" style="width: 140px;">
+                            <span class="confidence-line" style="<%= 'left: calc(' + signalValue.conf * 100 + '% - 1.5px);' %>" ></span>
+                          </div>
+                        </div>
+                      <% } else { %>
+                        <div style="margin: 5px 0;">
+                          <div style="display: flex; justify-content: space-between; margin-top: 5px; font-size: 8px;">
+                            <div style="text-align: left;">Least Confident</div>
+                            <div style="text-align: right;">Most Confident</div>                        
+                          </div>
+                          <div class="gradient-bar red-gradient" style="width: 140px;">
+                            <span class="confidence-line" style="<%= 'left: calc(' + signalValue.conf * 100 + '% - 1.5px);' %>" ></span>
+                          </div>
+                        </div>
+                      <% } %>
+                    </td>
                     <td><%= price.open %></td>
                     <td><%= price.high %></td>
                     <td><%= price.low %></td>

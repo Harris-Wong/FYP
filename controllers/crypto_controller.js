@@ -46,8 +46,7 @@ const index = async (req, res) => {
         signalValue = signalData[key];
       }
     }
-    signalValue.signal = true;
-    signalValue.conf = 0.7;
+
     res.render("index", { crypto: req.session.crypto, cryptoPairs, signalValue, newsArray });
   });
 };
