@@ -137,10 +137,10 @@
               <h4>Forecasting</h4>
             </div>
             <div class="card-body d-flex flex-column align-items-center">
-              <p style="margin: 0;">Forecast for <span id="tomorrow_predict_time"></span>:</p>
+              <p>Forecast for <span id="tomorrow_predict_time"></span>:</p>
               <p style="margin: 0;">
                 <% if (newsArray && newsArray.length > 0) { %>
-                  <span class="user-input">(based on Your News)</span>
+                  <span class="user-input">(based on your News)</span>
                 <% } %>
               </p>
               <div>
@@ -170,14 +170,14 @@
               </div>
 
               <% if (newsArray && newsArray.length > 0) { %>
-                <div style="text-align: left; font-size: 12px;">
+                <div style="font-size: 12px;">
                   <p>Your News:</p>
-                  <ul >
-                    <% for (let i = 0; i < newsArray.length; i++) { %>
-                      <li><%= newsArray[i] %></li>
-                    <% } %>
-                  </ul>  
                 </div>
+                <ul class="align-self-start" style="font-size: 12px; padding: 0 40px;">
+                  <% for (let i = 0; i < newsArray.length; i++) { %>
+                    <li style="text-align: left;"><%= newsArray[i] %></li>
+                  <% } %>
+                </ul>
               <% } %>
               <p style="color: #C0C0C0; margin-bottom: 0;">Next Forecast Countdown:</p>
               <p style="color: #C0C0C0; margin: 0;">(for <span id="day_after_tomorrow_predict_time"></span>)</p>
@@ -258,29 +258,53 @@
                 <% for (const price of crypto.prices) { %>
                   <tr>
                     <th scope="row"><%= price.date %></th>
-                    <td>-</td>
-                    <td>-</td>
-                    <td style="padding: 0; margin: 0;">
-                      <% if (signalValue && signalValue.signal == true) { %>
-                        <div style="margin: 5px 0;">
-                          <div style="display: flex; justify-content: space-between; margin-top: 5px; font-size: 8px;">
-                            <div style="text-align: left;">Least Confident</div>
-                            <div style="text-align: right;">Most Confident</div>                        
-                          </div>
-                          <div class="gradient-bar green-gradient" style="width: 140px;">
-                            <span class="confidence-line" style="<%= 'left: calc(' + signalValue.conf * 100 + '% - 1.5px);' %>" ></span>
-                          </div>
-                        </div>
+                    <td>
+                      <% if (price.actual == null) { %>
+                        <span>-</span>
                       <% } else { %>
-                        <div style="margin: 5px 0;">
-                          <div style="display: flex; justify-content: space-between; margin-top: 5px; font-size: 8px;">
-                            <div style="text-align: left;">Least Confident</div>
-                            <div style="text-align: right;">Most Confident</div>                        
+                        <% if (price.actual === true) { %>
+                          <i class="fa-solid fa-arrow-up fa-1x" style="color: #00ff00;"></i>
+                        <% } else { %>
+                          <i class="fa-solid fa-arrow-down fa-1x" style="color: #ff0000;"></i>
+                        <% } %>
+                      <% } %>
+                    </td>
+                    <td>
+                      <% if (!price.hasOwnProperty('forecast')) { %>
+                        <span>-</span>
+                      <% } else { %>               
+                        <% if (price.forecast === true) { %>
+                          <i class="fa-solid fa-arrow-up fa-1x" style="color: #00ff00;"></i>
+                        <% } else { %>
+                          <i class="fa-solid fa-arrow-down fa-1x" style="color: #ff0000;"></i>
+                        <% } %>
+                      <% } %>
+                    </td>
+                    <td style="padding: 0; margin: 0;">
+                      <% if (!price.hasOwnProperty('confidence')) { %>
+                        <span>-</span>
+                      <% } else { %>               
+                        <% if (price.forecast === true) { %>
+                          <div style="margin: 5px 0;">
+                            <div style="display: flex; justify-content: space-between; margin-top: 5px; font-size: 8px;">
+                              <div style="text-align: left;">Least Confident</div>
+                              <div style="text-align: right;">Most Confident</div>                        
+                            </div>
+                            <div class="gradient-bar green-gradient" style="width: 140px;">
+                              <span class="confidence-line" style="<%= 'left: calc(' + price.confidence * 100 + '% - 1.5px);' %>" ></span>
+                            </div>
                           </div>
-                          <div class="gradient-bar red-gradient" style="width: 140px;">
-                            <span class="confidence-line" style="<%= 'left: calc(' + signalValue.conf * 100 + '% - 1.5px);' %>" ></span>
+                        <% } else { %>
+                          <div style="margin: 5px 0;">
+                            <div style="display: flex; justify-content: space-between; margin-top: 5px; font-size: 8px;">
+                              <div style="text-align: left;">Least Confident</div>
+                              <div style="text-align: right;">Most Confident</div>                        
+                            </div>
+                            <div class="gradient-bar red-gradient" style="width: 140px;">
+                              <span class="confidence-line" style="<%= 'left: calc(' + price.confidence * 100 + '% - 1.5px);' %>" ></span>
+                            </div>
                           </div>
-                        </div>
+                        <% } %>
                       <% } %>
                     </td>
                     <td><%= price.open %></td>

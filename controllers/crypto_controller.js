@@ -1,5 +1,6 @@
 const fs = require('fs');
 const { spawn } = require('child_process');
+const csv = require('csv-parser');
 const cryptos = require("../models/cryptos");
 
 const cryptoPairs = {
@@ -26,11 +27,56 @@ const getToday = () => {
   return formattedDate;
 };
 
+const updatePrediction = (req) => {
+  return new Promise((resolve, reject) => {
+    const cryptoName = (req.session.crypto.summary.price.symbol).split("-")[0];
+    const predictionFile = [];
+  
+    fs.createReadStream(`./${cryptoName}_with_conf.csv`)
+      .pipe(csv({ headers: false }))
+      .on('data', (data) => predictionFile.push(data))
+      .on('end', () => {
+        // predictionFile[1:]['0']) -> Date
+        // predictionFile[1:]['4']) -> Strategy
+        // predictionFile[1:]['5']) -> Confidence
+        var historicalPrice = req.session.crypto.prices;
+        var pos = 1;
+        
+        historicalPrice.forEach((row, index) => {
+          let formattedDate;
+          if (cryptoName == 'BTC') {
+            const date = new Date(row.date);
+            const day = date.getDate();
+            const month = date.getMonth() + 1;
+            const year = date.getFullYear();
+            formattedDate = `${day}/${month}/${year}`;
+          } else {
+            formattedDate = row.date.toISOString().substring(0, 10);
+          }
+
+          if (pos <= predictionFile.length - 1 && formattedDate == predictionFile[pos]['0']) {
+            req.session.crypto.prices[index+1].forecast = predictionFile[pos]['4'] === 'Buy';
+            req.session.crypto.prices[index+1].confidence = predictionFile[pos]['5'];           
+            pos = pos + 1;
+          }
+        });
+
+        resolve(req);
+      });
+  });
+};
+
 const index = async (req, res) => {
   if (!req.session.crypto) {
     // Default value for display: Bitcoin
     const crypto = await cryptos.getCrypto("BTC-USD");
     req.session.crypto = crypto;
+
+    try {
+      req = await updatePrediction(req);
+    } catch (err) {
+      res.status(500).send("Error updating prediction");
+    }
   }
 
   // Get Signal Data
@@ -57,7 +103,12 @@ const getCryptoInfo = async (req, res) => {
   const crypto = await cryptos.getCrypto(code);
   req.session.crypto = crypto;
 
-  res.redirect("/");
+  try {
+    req = await updatePrediction(req);
+    res.redirect("/");
+  } catch (err) {
+    res.status(500).send("Error updating prediction");
+  }
 };
 
 // Handle the user's news input
@@ -65,10 +116,12 @@ const updateNewsInput = async (req, res) => {
   if (req.body.predict_button) {
     // Perform operation for Predict button
     let newsInput = req.body.newsInput;
-    newsInput = JSON.stringify(newsInput).split('\\r\\n').join(" ");
+    console.log(newsInput)
 
     if (newsInput && newsInput.trim() !== '') {
       // Check for empty or space input
+      newsInput = JSON.stringify(newsInput).split('\\r\\n').join(" ");
+      
       const today = getToday();
       
       // Handle News Input
@@ -141,3 +194,30 @@ function runProcess(command, args) {
 }
 
 module.exports = { index, getCryptoInfo, updateNewsInput};
+
+
+
+// const updatePrediction = (req) => {
+//   return new Promise((resolve, reject) => {
+//     const cryptoName = (req.session.crypto.summary.price.symbol).split("-")[0];
+//     const predictions = [];
+  
+//     fs.createReadStream('./decisions.csv')
+//       .pipe(csv({ headers: false }))
+//       .on('data', (data) => predictions.push(data))
+//       .on('end', () => {
+//         const predictionIndex = parseInt(((object, value) => Object.keys(object).find(key => object[key] === value))(predictions[0], cryptoName));
+//         var historicalPrice = req.session.crypto.prices;
+//         var pos = 1;
+        
+//         historicalPrice.forEach((row, index) => {
+//           if (pos <= predictions.length - 1 && row.date.toISOString().substring(0, 10) === predictions[pos][0]) {
+//             // req.session.crypto.prices[index+1].prediction = `${predictions[pos][predictionIndex]}, ${predictions[pos][0]}`;
+//             req.session.crypto.prices[index+1].prediction = predictions[pos][predictionIndex];
+//             pos = pos + 1;
+//           }
+//         });
+//         resolve(req);
+//       });
+//   });
+// };
