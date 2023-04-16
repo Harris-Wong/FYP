@@ -22,59 +22,53 @@
   <script src="https://code.highcharts.com/stock/modules/drag-panes.js"></script>
   <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
   <script src="https://code.highcharts.com/stock/modules/accessibility.js"></script>
+  <script src="https://code.highcharts.com/stock/indicators/ema.js"></script>
+  <script src="https://code.highcharts.com/stock/indicators/macd.js"></script>
   <!-- Font Awesome -->
   <script src="https://kit.fontawesome.com/e492bd99df.js" crossorigin="anonymous"></script>
 
   <script type="text/javascript">
     function display_current_time() {
-      var x = new Date().toUTCString();
-      document.getElementById('current_time').innerHTML = x;
+      var currentTime = new Date().toUTCString();
+      document.getElementById('current_time').innerHTML = currentTime;
     }
     setInterval(display_current_time, 1000);
-  </script>
-  <script type="text/javascript">
+
     function display_next_predict_time() {
       var now = new Date();
       var endOfDay = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()+1, 0, 0, 0));
       var timeLeft = endOfDay.getTime() - now.getTime();
-      var countdown = new Date(timeLeft).toISOString().substr(11, 8);
-      document.getElementById('next_predict_time').innerHTML = countdown;
+      var newPredictTime = new Date(timeLeft).toISOString().substr(11, 8);
+      document.getElementById('next_predict_time').innerHTML = newPredictTime;
     }
     setInterval(display_next_predict_time, 1000);
+
+    function display_tomorrow_predict_time() {
+      var date = new Date(Date.now() + new Date().getTimezoneOffset() * 60 * 1000);
+
+      date.setDate(date.getUTCDate() + 1);
+      date.setHours(23);
+      date.setMinutes(59);
+      date.setSeconds(00);
+      date = date.toDateString().replace(/\s/, ", ") + ' 23' + ':' + '59' + ':' + '00' + ' GMT';
+
+      document.getElementById('tomorrow_predict_time').innerHTML = '<b>' + date + '</b>';
+    }
+    setInterval(display_tomorrow_predict_time, 1000);
+
+    function display_day_after_tomorrow_predict_time() {
+      var date = new Date(Date.now() + new Date().getTimezoneOffset() * 60 * 1000);
+
+      date.setDate(date.getUTCDate() + 2);
+      date.setHours(23);
+      date.setMinutes(59);
+      date.setSeconds(00);
+      date = date.toDateString().replace(/\s/, ", ") + ' 23' + ':' + '59' + ':' + '00' + ' GMT';
+
+      document.getElementById('day_after_tomorrow_predict_time').innerHTML = '<b>' + date + '</b>';
+    }
+    setInterval(display_day_after_tomorrow_predict_time, 1000);
   </script>
-  <style>
-
-    .gradient-bar {
-      width: 200px;
-      height: 20px;
-      position: relative;
-      background-repeat: no-repeat;
-      background-position: left center;
-      background-clip: content-box;
-    }
-
-    .red-gradient {
-      background: linear-gradient(to right, #8b0000 0%, #ff0000 100%);
-      background-size: 200px 100%;
-    }
-
-    .green-gradient {
-      background: linear-gradient(to right, #006400 0%, #00ff00 100%);
-      background-size: 200px 100%;
-    }
-
-    .confidence-line {
-      position: absolute;
-      top: -2px;
-      left: calc(50% - 1.5px);
-      width: 3px;
-      height: calc(100% + 4px);
-      background-color: #000;
-      z-index: 1;
-    }
-
-  </style>
-
 </head>
 
 <body>
@@ -143,11 +137,11 @@
               <h4>Forecasting</h4>
             </div>
             <div class="card-body d-flex flex-column align-items-center">
-              <p>Forecast for Tomorrow 
+              <p style="margin: 0;">Forecast for <span id="tomorrow_predict_time"></span>:</p>
+              <p style="margin: 0;">
                 <% if (newsArray && newsArray.length > 0) { %>
                   <span class="user-input">(based on Your News)</span>
                 <% } %>
-                :
               </p>
               <div>
                 <% if (signalValue && signalValue.signal == true) { %>
@@ -185,7 +179,9 @@
                   </ul>  
                 </div>
               <% } %>
-              <p style="color: #C0C0C0;">Next Forecast Countdown: <span id="next_predict_time"></span></p>
+              <p style="color: #C0C0C0; margin-bottom: 0;">Next Forecast Countdown:</p>
+              <p style="color: #C0C0C0; margin: 0;">(for <span id="day_after_tomorrow_predict_time"></span>)</p>
+              <p style="color: #C0C0C0;"><span id="next_predict_time"></span></p>
             </div>
           </div>
         </div>
@@ -199,7 +195,7 @@
               <p><b>Open:</b> $<%= parseFloat((crypto.summary.summaryDetail.regularMarketOpen).toPrecision(6)) %></p>
               <p><b>High:</b> $<%= parseFloat((crypto.summary.summaryDetail.regularMarketDayHigh).toPrecision(6)) %></p>
               <p><b>Low:</b> $<%= parseFloat((crypto.summary.summaryDetail.regularMarketDayLow).toPrecision(6)) %></p>
-              <p><b>Volume:</b> $<%= (crypto.summary.summaryDetail.volume).toLocaleString("en-US") %></p>
+              <p><b>Volume:</b> <%= (crypto.summary.summaryDetail.volume).toLocaleString("en-US") %></p>
               <p><b>Market Cap:</b> <%= (crypto.summary.summaryDetail.marketCap).toLocaleString("en-US") %></p>
               <p><b>Circulating Supply:</b> <%= (crypto.summary.summaryDetail.circulatingSupply).toLocaleString("en-US") %></p>
             </div>

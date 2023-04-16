@@ -118,3 +118,33 @@ th {
 .card-body {
   padding: 5px 10px;
 }
+
+/* Gradient Bar */
+.gradient-bar {
+  width: 200px;
+  height: 20px;
+  position: relative;
+  background-repeat: no-repeat;
+  background-position: left center;
+  background-clip: content-box;
+}
+
+.red-gradient {
+  background: linear-gradient(to right, #8b0000 0%, #ff0000 100%);
+  background-size: 200px 100%;
+}
+
+.green-gradient {
+  background: linear-gradient(to right, #006400 0%, #00ff00 100%);
+  background-size: 200px 100%;
+}
+
+.confidence-line {
+  position: absolute;
+  top: -2px;
+  left: calc(50% - 1.5px);
+  width: 3px;
+  height: calc(100% + 4px);
+  background-color: #000;
+  z-index: 1;
+}
