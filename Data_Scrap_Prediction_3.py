@@ -33,6 +33,19 @@ posts = pd.DataFrame(posts, columns = ['tiitle', 'created'])
 
 df_input = pd.read_csv("./data/news/input_news.csv")
 df_input = df_input.rename(columns={'date': 'Date', 'input': 'News Header'})
+
+for i in range(len(df_input)):
+    df_input['Date'].iloc[i] = df_input['Date'].iloc[i][1:]
+    if (df_input['Date'].iloc[i][0] == "0"):
+        df_input['Date'].iloc[i] = df_input['Date'].iloc[i][1:]
+    ind = (df_input)['Date'].iloc[i].index('/')
+    if (df_input['Date'].iloc[i][ind+1] == "0"):
+        df_input['Date'].iloc[i] = df_input['Date'].iloc[i][:ind+1] + df_input['Date'].iloc[i][ind+2:]
+
+
+# In[3]:
+
+
 df_input.set_index("Date", inplace=True)
 df = pd.read_csv("./data/news/news3.csv")
 df = df.iloc[::-1]
@@ -42,7 +55,7 @@ df = df.rename(columns={'created': 'Date', 'title': 'News Header'})
 df.set_index("Date", inplace=True)
 
 
-# In[3]:
+# In[4]:
 
 
 df.sort_index(ascending=True, inplace=True)
@@ -61,7 +74,7 @@ if 'Unnamed: 0' in df.columns:
 df = df.append(df_input)
 
 
-# In[4]:
+# In[5]:
 
 
 cryptos_df = []
@@ -75,7 +88,7 @@ for i in range(len(cryptos)):
     cryptos_df.append(crypto_df)
 
 
-# In[5]:
+# In[6]:
 
 
 import pandas as pd
@@ -92,7 +105,7 @@ from nltk import word_tokenize
 from torchtext.data import Field, TabularDataset, BucketIterator
 
 
-# In[6]:
+# In[7]:
 
 
 # The RNN model
@@ -122,7 +135,7 @@ class Text_RNN(nn.Module):
         return out
 
 
-# In[7]:
+# In[8]:
 
 
 # Define saving and loading of models
@@ -147,7 +160,7 @@ def load_checkpoint(save_path, model, optimizer):
     return val_acc
 
 
-# In[8]:
+# In[9]:
 
 
 # LSTM model
@@ -175,7 +188,7 @@ class Text_RNN_m2(nn.Module):
         return out
 
 
-# In[9]:
+# In[10]:
 
 
 def TEST_non_ensemble(model, test_loader, device): 
@@ -226,14 +239,14 @@ def TEST_ensemble(model_1_tuple, model_2_tuple, model_3_tuple, test_loader, devi
     return y_pred
 
 
-# In[10]:
+# In[11]:
 
 
 from torch.optim import Adam
 for i in range(len(cryptos)):
     df_pred = cryptos_df[i][["Adj Close"]]
     try_merge = pd.merge(df, df_pred, how="inner", on=["Date"])
-    prediction_date = df_pred.index[-1]
+    prediction_date = df_pred.index.to_list()[-1]
     df_merge = df_pred
     if prediction_date not in try_merge.index:
         df_merge = pd.merge(df, df_pred, how="outer", on=["Date"])

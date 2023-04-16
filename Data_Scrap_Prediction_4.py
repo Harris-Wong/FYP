@@ -42,13 +42,16 @@ def classify_lstm(prediction):
     return c
 
 def Decision(mlr, cnnlong, cnnshort, adjclose, rnn):
-  #mlr = 6/4 prediction (float)
-  #adjclose = 5/4 adj close (float)
-  #rnn = array (float)
-  if mlr >= adjclose + 450:
-    return True
-  else:
-    return False
+    #mlr = 6/4 prediction (float)
+    #adjclose = 5/4 adj close (float)
+    #rnn = array (float)
+    maxrnn = 0
+    if rnn:
+        maxrnn = max(rnn)
+    if (mlr/adjclose>1.0224) | (maxrnn > 0.602):
+        return True
+    else:
+        return False
 
 def calculate_conf_level(mlr,adjclose,news):
     if news:
@@ -108,16 +111,18 @@ if __name__ == "__main__":
         y = df[['Adj Close']][-26:-1]
         mlr = LinearRegression().fit(x,y)
         mlr_prediction = mlr.predict(df[['LSTM_2014','LSTM_2017','CNN_Prediction_long','CNN_Prediction_short']].iloc[-1:,:])[0][0]
+        df.insert(0, "MLR_Prediction", np.nan)
+        news_array = []
         # Strategy
-        news_array = str(df.iloc[-1,0])[1:-1].split(',')
+        df.iloc[-1, 0] = mlr_prediction
+        if not pd.isna(df.iloc[-1,1]):
+            news_array = str(df.iloc[-1,1])[1:-1].split(',')
+            for i in range(len(news_array)):
+                news_array[i] = float(news_array[i])
         # Confidence Level
-        for i in range(len(news_array)):
-            number = news_array[i].split('.')
-            number = float(number[1])/10.0
-            news_array[i] = number
-        cdf = calculate_conf_level(mlr_prediction,df.iloc[-1,3],news_array)
+        cdf = calculate_conf_level(mlr_prediction,df.iloc[-1,4],news_array)
         # Strategy
-        signal = Decision(mlr_prediction,df.iloc[-1,1],df.iloc[-1,2],df.iloc[-1,3],news_array)
+        signal = Decision(mlr_prediction,df.iloc[-1,2],df.iloc[-1,3],df.iloc[-1,4],news_array)
         json_file[coin] = {"signal":signal,"conf":cdf}
         # Save CSV
         df.to_csv(f"data/processed/{coin}_final_predicted.csv")
