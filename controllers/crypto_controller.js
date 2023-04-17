@@ -1,8 +1,11 @@
 const fs = require('fs');
 const { spawn } = require('child_process');
-const csv = require('csv-parser');
+// const csv = require('csv-parser');
 const cryptos = require("../models/cryptos");
+// const { apiFetch } = require('./data_fetch.js');
 const cronTask = require('../models/cron_task');
+
+
 
 const cryptoPairs = {
   "BTC-USD": "Bitcoin USD",
@@ -50,9 +53,13 @@ const updatePrediction = (req) => {
         const year = date.getFullYear();
         const formattedDate = `${day}/${month}/${year}`;
 
+
         if (pos <= Object.keys(backtestData).length - 1 && formattedDate == Object.keys(backtestData)[pos]) {
-          req.session.crypto.prices[index+1].forecast = backtestData[Object.keys(backtestData)[pos]].signal;
-          req.session.crypto.prices[index+1].confidence = backtestData[Object.keys(backtestData)[pos]].conf;           
+          try {
+            req.session.crypto.prices[index+1].forecast = backtestData[Object.keys(backtestData)[pos]].signal;
+            req.session.crypto.prices[index+1].confidence = backtestData[Object.keys(backtestData)[pos]].conf;           
+          } catch (err) {
+          }
           pos = pos + 1;
         }
       });
@@ -135,15 +142,15 @@ const updateNewsInput = async (req, res) => {
           newsArray.push(news);
         }
       })
-      // try {
-      //   await runProcess('python', ['Data_Scrap_Prediction_3.py']);
-      //   console.log('News Prediction 1/2 completed');
+      try {
+        await runProcess('python', ['Data_Scrap_Prediction_3.py']);
+        console.log('News Prediction 1/2 completed');
     
-      //   await runProcess('python', ['Data_Scrap_Prediction_4.py']);
-      //   console.log('News Prediction 2/2 completed');
-      // } catch (error) {
-      //   console.error(error);
-      // }
+        await runProcess('python', ['Data_Scrap_Prediction_4.py']);
+        console.log('News Prediction 2/2 completed');
+      } catch (error) {
+        console.error(error);
+      }
     }
   } else if (req.body.clear_button) {
     // Perform operation for Clean button
@@ -152,28 +159,44 @@ const updateNewsInput = async (req, res) => {
       if (err) throw err;
     });
     newsArray = [];
-    // try {
-    //   await runProcess('python', ['Data_Scrap_Prediction_3.py']);
-    //   console.log('News Prediction 1/2 completed');
+    try {
+      await runProcess('python', ['Data_Scrap_Prediction_3.py']);
+      console.log('News Prediction 1/2 completed');
       
-    //   await runProcess('python', ['Data_Scrap_Prediction_4.py']);
-    //   console.log('News Prediction 2/2 completed');
-    // } catch (error) {
-    //   console.error(error);
-    // }
+      await runProcess('python', ['Data_Scrap_Prediction_4.py']);
+      console.log('News Prediction 2/2 completed');
+    } catch (error) {
+      console.error(error);
+    }
   }
-
   res.redirect("/");
 };
 
-const rePredict = async (req, res) => {
-  await cronTask.predictionTask();
-  console.log ("Re-Predict Done!");
-
-  req.session = null;
-  
-  res.redirect("/");
+const repredict = async (req, res) => {
+  if (req.body.repredict_button) {
+  try {
+    await cronTask.predictionTask();
+  } catch (error) {
+    console.error(error);
+  }
 }
+  else if (req.body.retrain_button) {
+  try {
+
+
+
+      //training codes
+      //training codes
+
+
+
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  res.redirect("/");
+};
+
 
 function runProcess(command, args) {
   return new Promise((resolve, reject) => {
@@ -197,4 +220,4 @@ function runProcess(command, args) {
   });
 }
 
-module.exports = { index, getCryptoInfo, updateNewsInput, rePredict};
+module.exports = { index, getCryptoInfo, updateNewsInput, repredict};
