@@ -55,31 +55,44 @@ def Decision(mlr, cnnlong, cnnshort, adjclose, rnn):
 
 def calculate_conf_level(mlr,adjclose,news,coin):
     if news:
-        rnn = max(news)
+        news = np.array(news).astype(np.float)
+        rnn = news.mean()
+        best_rnn = max(news)
     else:
         rnn = None
     dif_true_up = joblib.load(f"./trained_parameters/conf_intervals/{coin}_dif_true_up.save")
-    dif_true_down = joblib.load(f"./trained_parameters/{coin}_dif_true_down.save")
+    dif_true_down = joblib.load(f"./trained_parameters/conf_intervals/{coin}_dif_true_down.save")
     mlr_dif = (mlr/adjclose)-1.0244
     mlr_dif = mlr_dif/1.0244
+    
     if rnn:
         rnn_dif = (rnn-0.602)/0.602
+        best_rnn_dif = (best_rnn-0.602)/0.602
+        total_dif = (mlr_dif + rnn_dif) /2
     else:
-        rnn_dif = 0
+        best_rnn_dif = 0
+        total_dif = mlr_dif
+        
     target = 0
-    if (mlr_dif > 0) or (rnn_dif > 0): # Buy signal
-        target = max(mlr_dif,rnn_dif)
-        p = sum(i < target for i in dif_true_up)
-        cdf = p/len(dif_true_up)
-        # print(f"Confidence level of this Buy signal is: {round(cdf*100,3)}%")
-        return round(cdf,5)
+    if (mlr_dif > 0) or (best_rnn_dif > 0): # Buy signal
+        if total_dif > 0:
+            target = total_dif
+            p = sum(i < target for i in dif_true_up)
+            cdf = p/len(dif_true_up)
+            # print(f"Confidence level of this Buy signal is: {round(cdf*100,3)}%")
+            return round(cdf,5)
+        else:
+            cdf = 0
         
     else:
-        target = min(mlr_dif,rnn_dif)
-        p = sum(i > target for i in dif_true_down)
-        cdf = p/len(dif_true_down)
-        # print(f"Confidence level of this Sell signal is: {round(cdf*100,3)}%")
-        return round(cdf,5)
+        if total_dif < 0:
+            target = total_dif
+            p = sum(i > target for i in dif_true_down)
+            cdf = p/len(dif_true_down)
+            # print(f"Confidence level of this Sell signal is: {round(cdf*100,3)}%")
+            return round(cdf,5)
+        else:
+            cdf = 0
     
     
 if __name__ == "__main__":
@@ -120,7 +133,7 @@ if __name__ == "__main__":
             for i in range(len(news_array)):
                 news_array[i] = float(news_array[i])
         # Confidence Level
-        cdf = calculate_conf_level(mlr_prediction,df.iloc[-1,4],news_array,coin)
+        cdf = calculate_conf_level(mlr_prediction,df.iloc[-1,4],news_array, coin)
         # Strategy
         signal = Decision(mlr_prediction,df.iloc[-1,2],df.iloc[-1,3],df.iloc[-1,4],news_array)
         json_file[coin] = {"signal":signal,"conf":cdf}
