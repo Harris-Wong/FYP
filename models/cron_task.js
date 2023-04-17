@@ -4,28 +4,23 @@ const { apiFetch } = require('./data_fetch.js');
 async function predictionTask() {
   try {
     // Run the JavaScript file
-    await runProcess('node', ['-e', `${apiFetch.toString()}; apiFetch()`]);
-    console.log('Data Fetch completed');
+    // await runProcess('node', ['-e', `${apiFetch.toString()}; apiFetch()`]);
+    // console.log('Data Fetch completed');
 
-    // Run the Python files in order
-    await runProcess('python', ['Data_Scrap_Prediction_1.py']);
-    //await runProcess('python3', ['Data_Scrap_Prediction_1.py']);
-    console.log('Data Scrap Prediction 1/4 completed');
+    // // Run the Python files in order
+    // await runProcess('python', ['Data_Scrap_Prediction_1.py']);
+    // console.log('Data Scrap Prediction 1/4 completed');
 
-    await runProcess('python', ['Data_Scrap_Prediction_2.py']);
-    //await runProcess('python3', ['Data_Scrap_Prediction_2.py']);
-    console.log('Data Scrap Prediction 2/4 completed');
+    // await runProcess('python', ['Data_Scrap_Prediction_2.py']);
+    // console.log('Data Scrap Prediction 2/4 completed');
 
-    await runProcess('python', ['Data_Scrap_Prediction_3.py']);
-    //await runProcess('python3', ['Data_Scrap_Prediction_3.py']);
-    console.log('Data Scrap Prediction 3/4 completed');
+    // await runProcess('python', ['Data_Scrap_Prediction_3.py']);
+    // console.log('Data Scrap Prediction 3/4 completed');
 
     await runProcess('python', ['Data_Scrap_Prediction_4.py']);
-    //await runProcess('python3', ['Data_Scrap_Prediction_4.py']);
     console.log('Data Scrap Prediction 4/4 completed');
-    
-    console.log('All Predictions completed!');
-    
+    console.log('All Prediction completed');
+
   } catch (error) {
     console.error(error);
   }
