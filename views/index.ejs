@@ -81,44 +81,45 @@
 
       <nav class="navbar navbar-expand-sm navbar-light d-flex justify-content-between">
 
+        <a class="navbar-brand d-flex" style="min-width: 270px;">
+          <img class="card-crypto-image" width="58" height="58" src="<%= 'https://assets.coincap.io/assets/icons/' + crypto.summary.price.symbol.split('-')[0].toLowerCase() + '@2x.png' %>" alt="<%= crypto.summary.price.symbol.split('-')[0] %>">
+          <form class="crypto-selection d-flex form-inline ms-2 flex-shink-0" action="/getCryptoInfo" method="post">
+            <select class="form-select" name="cryptos" id="crypto-select">
+              <% Object.keys(cryptoPairs).forEach(function(cryptoKey) { %>
+                <option value="<%= cryptoKey %>" <% if (crypto.summary.price.symbol === cryptoKey) { %> selected <% } %>>
+                  <%= cryptoPairs[cryptoKey] %>
+                </option>
+              <% }); %>
+            </select>
+          </form>
+        </a>
+        <!-- <span class="card-crypto-symbol">( <%= crypto.summary.price.symbol %> )</span> -->
+        
         <div class="d-flex">
-          <a class="navbar-brand d-flex" style="min-width: 270px;">
-            <img class="card-crypto-image" width="58" height="58" src="<%= 'https://assets.coincap.io/assets/icons/' + crypto.summary.price.symbol.split('-')[0].toLowerCase() + '@2x.png' %>" alt="<%= crypto.summary.price.symbol.split('-')[0] %>">
-            <form class="crypto-selection d-flex form-inline ms-2 flex-shink-0" action="/getCryptoInfo" method="post">
-              <select class="form-select" name="cryptos" id="crypto-select">
-                <% Object.keys(cryptoPairs).forEach(function(cryptoKey) { %>
-                  <option value="<%= cryptoKey %>" <% if (crypto.summary.price.symbol === cryptoKey) { %> selected <% } %>>
-                    <%= cryptoPairs[cryptoKey] %>
-                  </option>
-                <% }); %>
-              </select>
-            </form>
-          </a>
-          <!-- <span class="card-crypto-symbol">( <%= crypto.summary.price.symbol %> )</span> -->
-          
-          <div class="d-flex">
-            <form class="d-flex form-inline ms-auto align-items-center" style="margin: 0; padding: 0" action="/updateNewsInput" method="post">
-              <div class="form-group">
-                <textarea
-                  id="exampleFormControlTextarea1"
-                  class="form-control"
-                  data-toggle="tooltip"
-                  data-placement="bottom"
-                  title="Enter any news for price prediction"
-                  name="newsInput"
-                  rows="1" cols="30"
-                  placeholder="(Optional) News Input"
-                ></textarea>
-              </div>
-              <button name="predict_button" value="predict" class="btn btn-dark mx-2" type="submit" style="white-space: nowrap;">Predict with News</button>
-              <button name="clear_button" value="Clear" class="btn btn-danger" type="submit" style="white-space: nowrap;">Clear All News</button>
-            </form>
-          </div>
+          <form class="d-flex form-inline ms-auto" action="/updateNewsInput" method="post">
+            <div class="form-group mx-1">
+              <textarea
+                id="exampleFormControlTextarea1"
+                class="form-control"
+                data-toggle="tooltip"
+                data-placement="bottom"
+                title="Enter any news for price prediction"
+                name="newsInput"
+                rows="1" cols="30"
+                placeholder="(Optional) News Input"
+              ></textarea>
+            </div>
+            <button name="predict_button" value="predict" class="btn btn-dark mx-2" type="submit">Predict with News</button>
+            <button name="clear_button" value="Clear" class="btn btn-danger" type="submit" style="white-space: nowrap;">Clear All News</button>
+          </form>
         </div>
 
-        <form class="d-flex" method="post" action="/rePredict" onclick="return confirm('Are you sure you want to Re-Predict? This may take some time.');">
-          <button type="submit" name="retrain_button" class="btn btn-danger" style="white-space: nowrap;">Re-Predict</button>
-        </form>
+        <div class="d-flex">
+          <form class="d-flex form-inline ms-auto" action="/repredict" method="post">
+            <button name="repredict_button" value="repredict" class="btn btn-info mx-2" type="submit" style="white-space: nowrap;">Re-Fetch Data</button>
+            <button name="training_button" value="warning" class="btn btn-warning" type="submit" style="white-space: nowrap;">Re-Train Data</button>
+          </form>
+        </div>
 
       </nav>
 
