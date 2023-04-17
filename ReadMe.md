@@ -23,7 +23,7 @@
 #### 2.12 Install pyTorch according to the guidelines listed here: https://pytorch.org/ or https://github.com/pytorch/pytorch#from-source
 #### 2.13 >pip install torchtext==0.8.1 / >pip3 install torchtext==0.8.1 / >pip install torchtext==0.6.0 / >pip3 install torchtext==0.6.0
 #### 2.14 >pip install -U joblib / >pip3 install -U joblib
-'sklearn'
+#### 2.15 >pip install scikit-learn / >pip3 install scikit-learn
 
 
 ## Download trained model parameters (Too big can only through Google Drive).
