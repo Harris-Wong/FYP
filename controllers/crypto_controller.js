@@ -30,39 +30,35 @@ const getToday = () => {
 const updatePrediction = (req) => {
   return new Promise((resolve, reject) => {
     const cryptoName = (req.session.crypto.summary.price.symbol).split("-")[0];
-    const predictionFile = [];
   
-    fs.createReadStream(`./${cryptoName}_with_conf.csv`)
-      .pipe(csv({ headers: false }))
-      .on('data', (data) => predictionFile.push(data))
-      .on('end', () => {
-        // predictionFile[1:]['0']) -> Date
-        // predictionFile[1:]['4']) -> Strategy
-        // predictionFile[1:]['5']) -> Confidence
-        var historicalPrice = req.session.crypto.prices;
-        var pos = 1;
-        
-        historicalPrice.forEach((row, index) => {
-          let formattedDate;
-          if (cryptoName == 'BTC') {
-            const date = new Date(row.date);
-            const day = date.getDate();
-            const month = date.getMonth() + 1;
-            const year = date.getFullYear();
-            formattedDate = `${day}/${month}/${year}`;
-          } else {
-            formattedDate = row.date.toISOString().substring(0, 10);
-          }
+    fs.readFile('./backtest_signals.json', (err, data) => {
+      if (err) throw err;
 
-          if (pos <= predictionFile.length - 1 && formattedDate == predictionFile[pos]['0']) {
-            req.session.crypto.prices[index+1].forecast = predictionFile[pos]['4'] === 'Buy';
-            req.session.crypto.prices[index+1].confidence = predictionFile[pos]['5'];           
-            pos = pos + 1;
-          }
-        });
+      const jsonData = JSON.parse(data);
 
-        resolve(req);
+      const backtestData = jsonData[cryptoName];
+
+      var historicalPrice = req.session.crypto.prices;
+
+      var pos = 0;
+      
+      historicalPrice.forEach((row, index) => {
+        const date = new Date(row.date);
+        const day = date.getDate();
+        const month = date.getMonth() + 1;
+        const year = date.getFullYear();
+        const formattedDate = `${day}/${month}/${year}`;
+
+        if (pos <= Object.keys(backtestData).length - 1 && formattedDate == Object.keys(backtestData)[pos]) {
+          console.log(Object.keys(backtestData)[pos])
+          
+          req.session.crypto.prices[index+1].forecast = backtestData[Object.keys(backtestData)[pos]].signal;
+          req.session.crypto.prices[index+1].confidence = backtestData[Object.keys(backtestData)[pos]].conf;           
+          pos = pos + 1;
+        }
       });
+      resolve(req);
+    })
   });
 };
 
@@ -71,6 +67,8 @@ const index = async (req, res) => {
     // Default value for display: Bitcoin
     const crypto = await cryptos.getCrypto("BTC-USD");
     req.session.crypto = crypto;
+    
+
 
     try {
       req = await updatePrediction(req);
@@ -194,30 +192,3 @@ function runProcess(command, args) {
 }
 
 module.exports = { index, getCryptoInfo, updateNewsInput};
-
-
-
-// const updatePrediction = (req) => {
-//   return new Promise((resolve, reject) => {
-//     const cryptoName = (req.session.crypto.summary.price.symbol).split("-")[0];
-//     const predictions = [];
-  
-//     fs.createReadStream('./decisions.csv')
-//       .pipe(csv({ headers: false }))
-//       .on('data', (data) => predictions.push(data))
-//       .on('end', () => {
-//         const predictionIndex = parseInt(((object, value) => Object.keys(object).find(key => object[key] === value))(predictions[0], cryptoName));
-//         var historicalPrice = req.session.crypto.prices;
-//         var pos = 1;
-        
-//         historicalPrice.forEach((row, index) => {
-//           if (pos <= predictions.length - 1 && row.date.toISOString().substring(0, 10) === predictions[pos][0]) {
-//             // req.session.crypto.prices[index+1].prediction = `${predictions[pos][predictionIndex]}, ${predictions[pos][0]}`;
-//             req.session.crypto.prices[index+1].prediction = predictions[pos][predictionIndex];
-//             pos = pos + 1;
-//           }
-//         });
-//         resolve(req);
-//       });
-//   });
-// };
