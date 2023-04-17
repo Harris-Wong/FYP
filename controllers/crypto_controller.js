@@ -2,6 +2,7 @@ const fs = require('fs');
 const { spawn } = require('child_process');
 const csv = require('csv-parser');
 const cryptos = require("../models/cryptos");
+const cronTask = require('../models/cron_task');
 
 const cryptoPairs = {
   "BTC-USD": "Bitcoin USD",
@@ -66,8 +67,6 @@ const index = async (req, res) => {
     const crypto = await cryptos.getCrypto("BTC-USD");
     req.session.crypto = crypto;
     
-
-
     try {
       req = await updatePrediction(req);
     } catch (err) {
@@ -167,6 +166,15 @@ const updateNewsInput = async (req, res) => {
   res.redirect("/");
 };
 
+const rePredict = async (req, res) => {
+  await cronTask.predictionTask();
+  console.log ("Re-Predict Done!");
+
+  req.session = null;
+  
+  res.redirect("/");
+}
+
 function runProcess(command, args) {
   return new Promise((resolve, reject) => {
     const process = spawn(command, args);
@@ -189,4 +197,4 @@ function runProcess(command, args) {
   });
 }
 
-module.exports = { index, getCryptoInfo, updateNewsInput};
+module.exports = { index, getCryptoInfo, updateNewsInput, rePredict};
