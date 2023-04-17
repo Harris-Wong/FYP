@@ -109,7 +109,7 @@
                 placeholder="(Optional) News Input"
               ></textarea>
             </div>
-            <button name="predict_button" value="predict" class="btn btn-dark mx-2" type="submit">Predict with News</button>
+            <button name="predict_button" value="predict" class="btn btn-dark mx-2" type="submit" style="white-space: nowrap;">Predict with News</button>
             <button name="clear_button" value="Clear" class="btn btn-danger" type="submit" style="white-space: nowrap;">Clear All News</button>
           </form>
         </div>
@@ -331,6 +331,55 @@
     </div>
 
   </section>
+
+  <!-- Footer -->
+  <section id="footer">
+
+    <footer class="text-center text-lg-start" style="background-color: gainsboro">
+      <!-- Grid container -->
+      <div class="container-fluid">
+        <!--Grid row-->
+        <div class="row" style="padding-top: 4%; padding-bottom: 3%">
+          <!--Grid column-->
+          <div class="col-lg-6 col-md-12 mb-4 mb-md-0">
+            <h5 class="text-uppercase">Prediction</h5>
+            <p style="font-size: 13px; text-align: justify;">
+              Predictions are made for tomorrow's close at 2359 UTC. For the closing price of today, reference to yesterday's prediction. Prediction will be automatically updated at 0000 UTC every day. Upon the server begins each day, data fetched will become static. To dynamically fetch real-time data, press "Re-Fetch Data" button. You can do this how many times throughout a day as you want.
+            </p>
+            <h5 class="text-uppercase">About Our Model</h5>
+            <p style="font-size: 13px; text-align: justify;">
+              Our model gives a prediction direction and an auxiliary confidence score. A prediction direction of "Green Arrow, Up" means the price of that given crypto asset is likely to go up tomorrow; a prediction direction of "Red Arrow, Down" means the price of that respective crypto is likely to go down tomorrow. Confidence score captures the likelihood for the above predicted movement, i.e. the pricing of certain crypto tomorrow: "Most Confident, Up" > "Least Confident, Up" > "Least Confident, Down" > "Most Confident Down".
+            </p>
+            <p style="font-size: 13px; text-align: justify;">
+              Our model makes use of real-time stocks data, candlestick images, news sentiments, and other markets information to make predictions. Our data is trained by a Convolutional Neural Networks model, a Recurrent Neural Networks model, a Long-Short-Term-Memory modek, a Multiple Linear Regression, and a Operator Strategy model.
+            </p>
+            <h5 class="text-uppercase">News Input Function</h5>
+            <p style="font-size: 13px; text-align: justify;">
+              You may input any news of your interest into the text box above and click "Predict with News". Adding more news will append to the prediction list. You may clear all inputted news using the "Clear All News" button. News sentiments are shared among all crypto assets in our model.
+            </p>
+          </div>
+          <!--Grid column-->
+    
+          <!--Grid column-->
+          <div class="col-lg-6 col-md-12 mb-4 mb-md-0">
+            <h5 class="text-uppercase">Disclaimer</h5>
+            <p style="font-size: 13px; text-align: justify;">
+              Please note that any prediction model makes mistakes. It is advised to pay extra attention when making actual trading and do not 100% rely on the model due to incompleteness of capturing all information in the world. The development team of this model will not bear any responsibility for money lost due to incorrect prediction presented in this model. Nonetheless, this model gives guidance to the potential movements of cryptocurrencies, and it makes money in the long-run setting.
+            </p>
+            <p style="font-size: 13px; text-align: justify;">
+              This is a Final Year Project for the Computer Science Department in the academic year 2022-2023 of HKUST. Refer to the latest Intellectual Property of HKUST for copyright issues: <a href="https://okt.hkust.edu.hk/sites/default/files/IP-Policy/IP%20Policy_final.pdf" target="_blank">https://okt.hkust.edu.hk/sites/default/files/IP-Policy/IP%20Policy_final.pdf</a>
+            </p>
+          </div>
+          <!--Grid column-->
+        </div>
+        <!--Grid row-->
+      </div>
+      <!-- Grid container -->
+
+    </footer>
+
+  </section>
+
 
   <script>
   // Form Manipulation
