@@ -41,17 +41,23 @@ def classify_lstm(prediction):
             c.append(0)
     return c
 
-def Decision(mlr, cnnlong, cnnshort, adjclose, rnn):
+def Decision(mlr, cnnlong, cnnshort, adjclose, news):
     #mlr = 6/4 prediction (float)
     #adjclose = 5/4 adj close (float)
     #rnn = array (float)
     maxrnn = 0
-    if rnn:
-        maxrnn = max(rnn)
-    if (mlr/adjclose>1.0224) | (maxrnn > 0.602):
-        return True
+    rnn = np.array(news).astype(np.float)
+    if news:
+        maxrnn = rnn.mean()
+        if ((mlr/adjclose - 1.0224)/1.0224 + (maxrnn - 0.602)/0.602) >0:
+            return True
+        else:
+            return False
     else:
-        return False
+        if (mlr/adjclose - 1.0224) >0:
+            return True
+        else:
+            return False
 
 def calculate_conf_level(mlr,adjclose,news,coin):
     if news:
@@ -73,29 +79,32 @@ def calculate_conf_level(mlr,adjclose,news,coin):
         best_rnn_dif = 0
         total_dif = mlr_dif
         
-    target = 0
-    if (mlr_dif > 0) or (best_rnn_dif > 0): # Buy signal
-        if total_dif > 0:
-            target = total_dif
-            p = sum(i < target for i in dif_true_up)
-            cdf = p/len(dif_true_up)
-            # print(f"Confidence level of this Buy signal is: {round(cdf*100,3)}%")
-            return round(cdf,5)
-        else:
-            cdf = 0
+        
+    #if (mlr_dif > 0) or (best_rnn_dif > 0): # Buy signal
+    if total_dif > 0:
+        target = total_dif
+        p = sum(i < target for i in dif_true_up)
+        cdf = p/len(dif_true_up)
+        # print(f"Confidence level of this Buy signal is: {round(cdf*100,3)}%")
+        return round(cdf,5)
+        #else:
+            #cdf = 0
         
     else:
-        if total_dif < 0:
-            target = total_dif
-            p = sum(i > target for i in dif_true_down)
-            cdf = p/len(dif_true_down)
-            # print(f"Confidence level of this Sell signal is: {round(cdf*100,3)}%")
-            return round(cdf,5)
-        else:
-            cdf = 0
+        #if total_dif < 0:
+        target = total_dif
+        p = sum(i > target for i in dif_true_down)
+        cdf = p/len(dif_true_down)
+        # print(f"Confidence level of this Sell signal is: {round(cdf*100,3)}%")
+        return round(cdf,5)
+        #else:
+            #cdf = 0
     
     
 if __name__ == "__main__":
+    f = open ('backtest_signals.json', "r")
+    # Reading from file
+    historic_json = json.loads(f.read())
     json_file = {}
     for coin in assets:
         lstm2014 = 0
@@ -137,6 +146,7 @@ if __name__ == "__main__":
         # Strategy
         signal = Decision(mlr_prediction,df.iloc[-1,2],df.iloc[-1,3],df.iloc[-1,4],news_array)
         json_file[coin] = {"signal":signal,"conf":cdf}
+        historic_json[coin][df.index.to_list()[-1]] = {"signal":signal,"conf":cdf}
         # Save CSV
         df.to_csv(f"data/processed/{coin}_final_predicted.csv")
         #print(f"{coin}: Done")
@@ -145,5 +155,8 @@ if __name__ == "__main__":
     # Writing to sample.json
     with open("signals.json", "w") as outfile:
         outfile.write(json_object)
+    json_object = json.dumps(historic_json)
+    with open("backtest_signals.json", "w") as outfile:
+        outfile.write(json_object)
     # Done, exit()
-    exit()
+    # exit()
