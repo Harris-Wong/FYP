@@ -53,13 +53,13 @@ def Decision(mlr, cnnlong, cnnshort, adjclose, rnn):
     else:
         return False
 
-def calculate_conf_level(mlr,adjclose,news):
+def calculate_conf_level(mlr,adjclose,news,coin):
     if news:
         rnn = max(news)
     else:
         rnn = None
-    dif_true_up = joblib.load("./trained_parameters/dif_true_up.save")
-    dif_true_down = joblib.load("./trained_parameters/dif_true_down.save")
+    dif_true_up = joblib.load(f"./trained_parameters/conf_intervals/{coin}_dif_true_up.save")
+    dif_true_down = joblib.load(f"./trained_parameters/{coin}_dif_true_down.save")
     mlr_dif = (mlr/adjclose)-1.0244
     mlr_dif = mlr_dif/1.0244
     if rnn:
@@ -120,7 +120,7 @@ if __name__ == "__main__":
             for i in range(len(news_array)):
                 news_array[i] = float(news_array[i])
         # Confidence Level
-        cdf = calculate_conf_level(mlr_prediction,df.iloc[-1,4],news_array)
+        cdf = calculate_conf_level(mlr_prediction,df.iloc[-1,4],news_array,coin)
         # Strategy
         signal = Decision(mlr_prediction,df.iloc[-1,2],df.iloc[-1,3],df.iloc[-1,4],news_array)
         json_file[coin] = {"signal":signal,"conf":cdf}
