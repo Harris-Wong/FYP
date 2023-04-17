@@ -50,8 +50,6 @@ const updatePrediction = (req) => {
         const formattedDate = `${day}/${month}/${year}`;
 
         if (pos <= Object.keys(backtestData).length - 1 && formattedDate == Object.keys(backtestData)[pos]) {
-          console.log(Object.keys(backtestData)[pos])
-          
           req.session.crypto.prices[index+1].forecast = backtestData[Object.keys(backtestData)[pos]].signal;
           req.session.crypto.prices[index+1].confidence = backtestData[Object.keys(backtestData)[pos]].conf;           
           pos = pos + 1;
