@@ -18,7 +18,7 @@
 #### 2.7 >pip install tensorflow==2.4.1 / >pip3 install tensorflow==2.4.1
 #### 2.8 >pip install keras==2.4.3 / pip3 install keras==2.4.3
 #### 2.9 >pip install pyyaml h5py / >pip3 install pyyaml h5py
-#### 2.10 >pip install nltk / >pip3 install nltk
+#### 2.10 >pip install nltk==3.5 / >pip3 install nltk==3.5
 #### 2.11 >pip install praw / >pip3 install praw
 #### 2.12 Install pyTorch according to the guidelines listed here: https://pytorch.org/ or https://github.com/pytorch/pytorch#from-source
 #### 2.13 >pip install torchtext==0.8.1 / >pip3 install torchtext==0.8.1 / >pip install torchtext==0.6.0 / >pip3 install torchtext==0.6.0
