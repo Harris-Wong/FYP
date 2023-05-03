@@ -29,6 +29,8 @@
 ## Download trained model parameters (Too big can only through Google Drive).
 
 ### 3. Go to Google Drive to download CNN_trained_long and CNN_trained_short, replace those current folders under "trained parameters" directory
+https://drive.google.com/drive/folders/1rrbF6v1K1UVcl90O9wgg1wltUI2QSMpv?usp=sharing
+https://drive.google.com/drive/folders/1xsmHjKclw1YK2juOvsmnUt6Y81pinZ03?usp=sharing
 
 ## Begin the server
 
